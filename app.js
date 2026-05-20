@@ -2146,7 +2146,7 @@ let selectedPolicyDirectionIds = new Set();
 let activePromptDirection = null;
 let activePromptSuggestionText = '';
 const PUBLIC_AGENDA_REFRESH_MS = 5 * 60 * 1000;
-const PUBLIC_AGENDA_DEFAULT_VIEW = 'grid-3-2';
+const PUBLIC_AGENDA_DEFAULT_VIEW = 'list';
 const PUBLIC_AGENDA_VIEW_MODES = new Set(['grid-3-2', 'grid-2-3', 'list']);
 const PUBLIC_AGENDA_COMMITTEE_SHORT_LABELS = {
     '과학기술정보방송통신위원회': '과방위',
@@ -3974,6 +3974,10 @@ function renderSurveyDesignCards(questions) {
 
     const badgeLabels = {
         likert_5: '5점 척도',
+        multiple_choice: '객관식',
+        open_ended: '주관식',
+        issue_stance: '쟁점 질문',
+        policy_option: '정책 대안',
         binary: '양자택일',
         tripartite: '삼자택일',
         custom: '맞춤형',
@@ -4026,7 +4030,12 @@ function handleDesignQuestionKeydown(event, idx) {
 
 function updateDesignSelectionCount() {
     const countEl = document.getElementById('survey-design-count');
-    if (countEl) countEl.innerHTML = `<strong>${_selectedDesignQuestionIndices.size}</strong>개 선택됨`;
+    if (countEl) {
+        const selectedCount = _selectedDesignQuestionIndices.size;
+        const label = `${selectedCount}개 문항 선택됨`;
+        countEl.innerHTML = `<strong>${selectedCount}</strong>개 선택됨`;
+        countEl.setAttribute('aria-label', label);
+    }
 }
 
 async function runSequentialSimulationsFromDesign() {
@@ -4039,7 +4048,10 @@ async function runSequentialSimulationsFromDesign() {
 
     if (!selectedQuestions.length) {
         const countEl = document.getElementById('survey-design-count');
-        if (countEl) countEl.innerHTML = '<strong style="color:var(--opinion-disagree)">0</strong>개 선택됨 — 최소 1개 선택 필요';
+        if (countEl) {
+            countEl.innerHTML = '<strong style="color:var(--opinion-disagree)">0</strong>개 선택됨 — 최소 1개 문항을 선택하세요';
+            countEl.setAttribute('aria-label', '0개 문항 선택됨 — 최소 1개 문항을 선택하세요');
+        }
         return;
     }
 

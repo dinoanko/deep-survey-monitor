@@ -7,14 +7,14 @@
     <title>Deep Survey | 정책 반응 인텔리전스</title>
     <meta name="description" content="정책·메시지 발표 전 이해관계자 반응, 표본 설계, 프레임 취약점, 검증 질문을 감사 가능한 방식으로 점검하는 Deep Survey 정책 반응 시뮬레이션입니다.">
     <meta name="theme-color" content="#111827">
-    <link rel="canonical" href="https://17f298fdeb1ff9.lhr.life/">
+    <link rel="canonical" href="https://dinoanko.github.io/deep-survey-monitor/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Deep Survey">
     <meta property="og:title" content="Deep Survey | 정책 반응 인텔리전스">
     <meta property="og:description" content="정책 발표 전 이해관계자 반응과 메시지 리스크를 표본 설계와 감사 카드로 점검합니다.">
-    <meta property="og:url" content="https://17f298fdeb1ff9.lhr.life/">
-    <meta property="og:image" content="https://17f298fdeb1ff9.lhr.life/demo/issue-bg-city.png">
-    <meta property="og:image:secure_url" content="https://17f298fdeb1ff9.lhr.life/demo/issue-bg-city.png">
+    <meta property="og:url" content="https://dinoanko.github.io/deep-survey-monitor/">
+    <meta property="og:image" content="https://dinoanko.github.io/deep-survey-monitor/issue-bg-city.png">
+    <meta property="og:image:secure_url" content="https://dinoanko.github.io/deep-survey-monitor/issue-bg-city.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="1280">
     <meta property="og:image:height" content="720">
@@ -22,7 +22,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Deep Survey | 정책 반응 인텔리전스">
     <meta name="twitter:description" content="정책 이슈를 표본감사와 함께 사전 점검하는 Deep Survey 시뮬레이션.">
-    <meta name="twitter:image" content="https://17f298fdeb1ff9.lhr.life/demo/issue-bg-city.png">
+    <meta name="twitter:image" content="https://dinoanko.github.io/deep-survey-monitor/issue-bg-city.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         window.DEEP_SURVEY_ASSET_BASE = (() => {
@@ -32,7 +32,7 @@
                 path.includes('/demo/') ||
                 path.includes('/deep-survey-monitor/')
             ) return '';
-            return '/demo/';
+            return '';
         })();
         document.write(`<link rel="stylesheet" href="${window.DEEP_SURVEY_ASSET_BASE}styles.css?v=20260520bb">`);
         document.addEventListener('DOMContentLoaded', () => {
@@ -542,7 +542,7 @@
                     </div>
                     <div id="survey-design-grid" class="survey-design-grid"></div>
                     <div class="survey-design-actions">
-                        <span id="survey-design-count" class="survey-design-count"><strong>0</strong>개 선택됨</span>
+                        <span id="survey-design-count" class="survey-design-count" role="status" aria-live="polite" aria-atomic="true" aria-label="0개 문항 선택됨" data-survey-design-status><strong>0</strong>개 선택됨</span>
                         <button class="custom-sim-btn" onclick="runSequentialSimulationsFromDesign()">▶ 선택한 문항 시뮬레이션 실행</button>
                     </div>
                 </div>
@@ -608,9 +608,9 @@
                     <div class="public-agenda-head-controls">
                         <div class="public-agenda-meta" id="parliament-feed-status">계류 의안 동기화 대기</div>
                         <div class="public-agenda-view-switch" role="group" aria-label="의회 보기 모드">
-                            <button class="active" type="button" data-public-agenda-kind="parliament" data-public-view="grid-3-2" aria-label="3대2 카드 보기" title="3:2" aria-pressed="true" onclick="setPublicAgendaView('parliament','grid-3-2')"><span class="public-view-icon public-view-icon-3-2" aria-hidden="true"></span></button>
+                            <button type="button" data-public-agenda-kind="parliament" data-public-view="grid-3-2" aria-label="3대2 카드 보기" title="3:2" aria-pressed="false" onclick="setPublicAgendaView('parliament','grid-3-2')"><span class="public-view-icon public-view-icon-3-2" aria-hidden="true"></span></button>
                             <button type="button" data-public-agenda-kind="parliament" data-public-view="grid-2-3" aria-label="2대3 카드 보기" title="2:3" aria-pressed="false" onclick="setPublicAgendaView('parliament','grid-2-3')"><span class="public-view-icon public-view-icon-2-3" aria-hidden="true"></span></button>
-                            <button type="button" data-public-agenda-kind="parliament" data-public-view="list" aria-label="리스트 보기" title="리스트" aria-pressed="false" onclick="setPublicAgendaView('parliament','list')"><span class="public-view-icon public-view-icon-list" aria-hidden="true"></span></button>
+                            <button class="active" type="button" data-public-agenda-kind="parliament" data-public-view="list" aria-label="리스트 보기" title="리스트" aria-pressed="true" onclick="setPublicAgendaView('parliament','list')"><span class="public-view-icon public-view-icon-list" aria-hidden="true"></span></button>
                         </div>
                     </div>
                 </div>
@@ -638,9 +638,9 @@
                     <div class="public-agenda-head-controls">
                         <div class="public-agenda-meta" id="government-feed-status">정책브리핑 동기화 대기</div>
                         <div class="public-agenda-view-switch" role="group" aria-label="정부 보기 모드">
-                            <button class="active" type="button" data-public-agenda-kind="government" data-public-view="grid-3-2" aria-label="3대2 카드 보기" title="3:2" aria-pressed="true" onclick="setPublicAgendaView('government','grid-3-2')"><span class="public-view-icon public-view-icon-3-2" aria-hidden="true"></span></button>
+                            <button type="button" data-public-agenda-kind="government" data-public-view="grid-3-2" aria-label="3대2 카드 보기" title="3:2" aria-pressed="false" onclick="setPublicAgendaView('government','grid-3-2')"><span class="public-view-icon public-view-icon-3-2" aria-hidden="true"></span></button>
                             <button type="button" data-public-agenda-kind="government" data-public-view="grid-2-3" aria-label="2대3 카드 보기" title="2:3" aria-pressed="false" onclick="setPublicAgendaView('government','grid-2-3')"><span class="public-view-icon public-view-icon-2-3" aria-hidden="true"></span></button>
-                            <button type="button" data-public-agenda-kind="government" data-public-view="list" aria-label="리스트 보기" title="리스트" aria-pressed="false" onclick="setPublicAgendaView('government','list')"><span class="public-view-icon public-view-icon-list" aria-hidden="true"></span></button>
+                            <button class="active" type="button" data-public-agenda-kind="government" data-public-view="list" aria-label="리스트 보기" title="리스트" aria-pressed="true" onclick="setPublicAgendaView('government','list')"><span class="public-view-icon public-view-icon-list" aria-hidden="true"></span></button>
                         </div>
                     </div>
                 </div>
@@ -685,6 +685,7 @@
 
     <!-- Modal -->
     <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+        <button class="modal-close-button" type="button" aria-label="팝업 닫기" onclick="closeModal()">×</button>
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-body">
                 <div class="poll-briefing-card" id="poll-briefing-card">
@@ -729,6 +730,7 @@
                 </div>
             </div>
         </div>
+        <button class="modal-floating-back" type="button" aria-label="뒤로가기" onclick="closeModal()">← 뒤로</button>
     </div>
 
     <footer class="footer">
@@ -742,7 +744,7 @@
     </footer>
 
     <script>
-        ['app.js?v=20260520bc', 'issues_extra.js?v=20260515e', 'common-ui.js?v=20260520t', 'beta-intake.js?v=20260519b']
+        ['app.js?v=20260520bd', 'issues_extra.js?v=20260515e', 'common-ui.js?v=20260520t', 'beta-intake.js?v=20260519b']
             .forEach(src => document.write(`<script src="${window.DEEP_SURVEY_ASSET_BASE}${src}"><\/script>`));
     </script>
 </body>
