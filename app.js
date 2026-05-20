@@ -4127,6 +4127,8 @@ async function startSimulationJob(direction, issue, sampleSize) {
             policy_description: `${direction.description}\n\n질문 유형: ${direction.question_type === 'policy_option' ? '정책 방향 평가' : '쟁점 질문'}\n근거 이슈: ${issue?.title || ''}\n근거 자료: ${direction.source_text || ''}`,
             policy_type: direction.policy_type,
             sample_size: sampleSize,
+            question_type: direction.question_type || 'likert_5',
+            choices: direction.choices || null,
             question_design_toolkit_prompt: QUESTION_DESIGN_TOOLKIT_PROMPT,
             questionnaire_generation: questionnaireGeneration,
             ...getSamplingDesignOptions(),
@@ -5419,6 +5421,77 @@ function ensureCustomRegressionTab() {
     return document.getElementById('custom-regression-section');
 }
 
+function buildStatsCardsHtml(stats, questionType, choices) {
+    const s = stats || {};
+    if (questionType === 'binary' && choices && choices.length >= 2) {
+        const a = clampPercent((+s.agree || 0) + (+s.agreeish || 0));
+        const b = clampPercent((+s.disagreeish || 0) + (+s.disagree || 0));
+        return `
+            <div class="scale-stat-card agree">
+                <div class="value" style="color:var(--opinion-agree)">${formatPct(a)}%</div>
+                <div class="label">${escapeHtml(choices[0])}</div>
+            </div>
+            <div class="scale-stat-card disagree">
+                <div class="value" style="color:var(--opinion-disagree)">${formatPct(b)}%</div>
+                <div class="label">${escapeHtml(choices[1])}</div>
+            </div>`;
+    }
+    if (questionType === 'tripartite' && choices && choices.length >= 3) {
+        const a = clampPercent((+s.agree || 0) + (+s.agreeish || 0));
+        const b = clampPercent((+s.disagreeish || 0) + (+s.disagree || 0));
+        const u = clampPercent(+s.unsure || 0);
+        return `
+            <div class="scale-stat-card agree">
+                <div class="value" style="color:var(--opinion-agree)">${formatPct(a)}%</div>
+                <div class="label">${escapeHtml(choices[0])}</div>
+            </div>
+            <div class="scale-stat-card disagree">
+                <div class="value" style="color:var(--opinion-disagree)">${formatPct(b)}%</div>
+                <div class="label">${escapeHtml(choices[1])}</div>
+            </div>
+            <div class="scale-stat-card neutral">
+                <div class="value" style="color:var(--text-secondary)">${formatPct(u)}%</div>
+                <div class="label">${escapeHtml(choices[2])}</div>
+            </div>`;
+    }
+    if (questionType === 'custom' && choices && choices.length >= 2) {
+        const keys = ['agree', 'agreeish', 'disagreeish', 'disagree', 'unsure'];
+        const colors = ['var(--opinion-agree)', 'var(--opinion-agree-soft, #86efac)', 'var(--opinion-disagree-soft, #fca5a5)', 'var(--opinion-disagree)', 'var(--text-secondary)'];
+        return choices.map((label, i) => {
+            const val = clampPercent(+s[keys[i]] || 0);
+            return `
+                <div class="scale-stat-card">
+                    <div class="value" style="color:${colors[i] || 'var(--text-primary)'}">${formatPct(val)}%</div>
+                    <div class="label">${escapeHtml(label)}</div>
+                </div>`;
+        }).join('');
+    }
+    const totals = getOpinionTotals(s);
+    const netToneClass = totals.net > 0 ? 'is-positive' : totals.net < 0 ? 'is-negative' : 'is-neutral';
+    const netToneColor = totals.net > 0 ? 'var(--opinion-agree)' : totals.net < 0 ? 'var(--opinion-disagree)' : 'var(--text-secondary)';
+    let labels = { agree: '동의', disagree: '비동의', unsure: '판단 유보' };
+    if (choices && choices.length >= 5) {
+        labels = { agree: `${choices[0]}+${choices[1]}`, disagree: `${choices[2]}+${choices[3]}`, unsure: choices[4] };
+    }
+    return `
+        <div class="scale-stat-card net ${netToneClass}">
+            <div class="value" style="color:${netToneColor}">${formatSignedPoint(totals.net)}</div>
+            <div class="label">순동의 (${escapeHtml(labels.agree)} - ${escapeHtml(labels.disagree)})</div>
+        </div>
+        <div class="scale-stat-card agree">
+            <div class="value" style="color:var(--opinion-agree)">${formatPct(totals.agree)}%</div>
+            <div class="label">${escapeHtml(labels.agree)}</div>
+        </div>
+        <div class="scale-stat-card disagree">
+            <div class="value" style="color:var(--opinion-disagree)">${formatPct(totals.disagree)}%</div>
+            <div class="label">${escapeHtml(labels.disagree)}</div>
+        </div>
+        <div class="scale-stat-card neutral">
+            <div class="value" style="color:var(--text-secondary)">${formatPct(totals.unsure)}%</div>
+            <div class="label">${escapeHtml(labels.unsure)}</div>
+        </div>`;
+}
+
 function renderCustomSimResult(title, data) {
     if (!data || !data.stats) {
         renderSimulationFailure(new Error('Simulation result payload missing stats'), [{ title }], getSelectedLiveIssue(), getSelectedSampleSize());
@@ -5434,27 +5507,11 @@ function renderCustomSimResult(title, data) {
     document.getElementById('custom-result-source').textContent = formatCustomSource(data);
 
     const s = data.stats;
+    const choices = data.choices || [];
+    const questionType = data.question_type || 'likert_5';
     const totals = getOpinionTotals(s);
-    const netToneClass = totals.net > 0 ? 'is-positive' : totals.net < 0 ? 'is-negative' : 'is-neutral';
-    const netToneColor = totals.net > 0 ? 'var(--opinion-agree)' : totals.net < 0 ? 'var(--opinion-disagree)' : 'var(--text-secondary)';
-    let statsHtml = `
-        <div class="scale-stat-card net ${netToneClass}">
-            <div class="value" style="color:${netToneColor}">${formatSignedPoint(totals.net)}</div>
-            <div class="label">순동의 (동의 - 비동의)</div>
-        </div>
-        <div class="scale-stat-card agree">
-            <div class="value" style="color:var(--opinion-agree)">${formatPct(totals.agree)}%</div>
-            <div class="label">동의</div>
-        </div>
-        <div class="scale-stat-card disagree">
-            <div class="value" style="color:var(--opinion-disagree)">${formatPct(totals.disagree)}%</div>
-            <div class="label">비동의</div>
-        </div>
-        <div class="scale-stat-card neutral">
-            <div class="value" style="color:var(--text-secondary)">${formatPct(totals.unsure)}%</div>
-            <div class="label">판단 유보</div>
-        </div>`;
-    document.getElementById('custom-result-stats').innerHTML = statsHtml;
+    
+    document.getElementById('custom-result-stats').innerHTML = buildStatsCardsHtml(s, questionType, choices);
     const auditContainer = document.getElementById('custom-sampling-audit');
     if (auditContainer) {
         const llmAudit = ['nemotron_persona_sample', 'panel_persona_fallback'].includes(data.source)
@@ -5468,15 +5525,15 @@ function renderCustomSimResult(title, data) {
     if (actionContainer) actionContainer.innerHTML = buildNextActionPanel(title, data);
 
     // Political chart
-    document.getElementById('custom-political-chart').innerHTML = renderCrossChart(data.by_political);
+    document.getElementById('custom-political-chart').innerHTML = renderCrossChart(data.by_political, questionType, choices);
     // Age chart
-    document.getElementById('custom-age-chart').innerHTML = renderCrossChart(data.by_age);
+    document.getElementById('custom-age-chart').innerHTML = renderCrossChart(data.by_age, questionType, choices);
     // Region chart
     const regionTitle = document.getElementById('custom-region-chart-title');
     const regionChart = document.getElementById('custom-region-chart');
     if (regionTitle && regionChart) {
         regionTitle.textContent = data.by_region ? '지역별 반응' : 'persona군별 반응';
-        regionChart.innerHTML = renderCrossChart(data.by_region || data.by_persona_group);
+        regionChart.innerHTML = renderCrossChart(data.by_region || data.by_persona_group, questionType, choices);
     }
 
     const summaryTone = totals.net >= 15
@@ -6520,7 +6577,7 @@ function valueSide(value, otherValue, axisMax, preferLeft) {
     return value < otherValue ? 'label-left' : 'label-right';
 }
 
-function renderDetailDotChart(rows) {
+function renderDetailDotChart(rows, questionType, choices) {
     const visibleRows = (rows || []).filter(Boolean);
     if (!visibleRows.length) return '<p style="color:var(--text-secondary);font-size:11px">데이터 없음</p>';
 
@@ -6538,6 +6595,18 @@ function renderDetailDotChart(rows) {
         return `<span class="dot-chart-tick-label${edgeClass}" style="left:${(tick / axisMax) * 100}%">${tick}</span>`;
     }).join('');
 
+    let primaryLegend = "동의";
+    let secondaryLegend = "비동의";
+    if (choices && choices.length >= 2) {
+        if (questionType === 'binary' || questionType === 'tripartite') {
+            primaryLegend = choices[0];
+            secondaryLegend = choices[1];
+        } else {
+            primaryLegend = `${choices[0]} + ${choices[1]}`;
+            secondaryLegend = `${choices[3] || '비동의'} + ${choices[2] || ''}`;
+        }
+    }
+
     const body = visibleRows.map(row => {
         const primaryPct = (row.primary / axisMax) * 100;
         const secondaryPct = (row.secondary / axisMax) * 100;
@@ -6547,10 +6616,10 @@ function renderDetailDotChart(rows) {
             <div class="dot-chart-label">${escapeHtml(row.label)}</div>
             <div class="dot-chart-plot">
                 <div class="dot-chart-grid" aria-hidden="true">${tickLines}</div>
-                <span class="dot-chart-point dot-chart-primary ${primarySide}" style="left:${primaryPct}%" title="동의: ${formatPct(row.primary)}%">
+                <span class="dot-chart-point dot-chart-primary ${primarySide}" style="left:${primaryPct}%" title="${escapeHtml(primaryLegend)}: ${formatPct(row.primary)}%">
                     <span class="dot-chart-mark"></span><span class="dot-chart-value">${formatPct(row.primary)}%</span>
                 </span>
-                <span class="dot-chart-point dot-chart-secondary ${secondarySide}" style="left:${secondaryPct}%" title="비동의: ${formatPct(row.secondary)}%">
+                <span class="dot-chart-point dot-chart-secondary ${secondarySide}" style="left:${secondaryPct}%" title="${escapeHtml(secondaryLegend)}: ${formatPct(row.secondary)}%">
                     <span class="dot-chart-mark"></span><span class="dot-chart-value">${formatPct(row.secondary)}%</span>
                 </span>
             </div>
@@ -6559,8 +6628,8 @@ function renderDetailDotChart(rows) {
 
     return `<div class="detail-dot-chart">
         <div class="dot-chart-legend">
-            <span class="dot-legend-item dot-legend-primary"><span></span>동의</span>
-            <span class="dot-legend-item dot-legend-secondary"><span></span>비동의</span>
+            <span class="dot-legend-item dot-legend-primary"><span></span>${escapeHtml(primaryLegend)}</span>
+            <span class="dot-legend-item dot-legend-secondary"><span></span>${escapeHtml(secondaryLegend)}</span>
         </div>
         <div class="dot-chart-body">${body}</div>
         <div class="dot-chart-axis-row">
@@ -6570,8 +6639,8 @@ function renderDetailDotChart(rows) {
     </div>`;
 }
 
-function renderCrossChart(crossObj) {
+function renderCrossChart(crossObj, questionType, choices) {
     if (!crossObj || !Object.keys(crossObj).length) return '<p style="color:var(--text-secondary);font-size:11px">데이터 없음</p>';
     const rows = Object.entries(crossObj).map(([group, dist]) => distributionToDetailRow(group, dist));
-    return renderDetailDotChart(rows);
+    return renderDetailDotChart(rows, questionType, choices);
 }

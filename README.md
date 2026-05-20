@@ -1,5 +1,5 @@
 # Deep Survey Monitor
 
-Sanitized static monitoring snapshot for Jean. Source working repo: local GovAI/Deep Survey demo bundle.
+Sanitized static monitoring snapshot for Jean.
 
-This public build is for UI monitoring only; it does not expose private backend data or local runtime databases.
+Public URL: https://dinoanko.github.io/deep-survey-monitor/
