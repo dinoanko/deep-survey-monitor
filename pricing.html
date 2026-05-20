@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Survey - 결제</title>
+    <meta name="description" content="로그인 후 주문 확인, 원화/VAT, 세금계산서, 취소 기준을 결제 전 확인하는 Deep Survey 요금제.">
+    <meta name="theme-color" content="#111827">
+    <link rel="canonical" href="https://17f298fdeb1ff9.lhr.life/demo/pricing.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Deep Survey">
+    <meta property="og:title" content="Deep Survey 요금제 | 원화 결제">
+    <meta property="og:description" content="로그인 후 주문 확인, 원화/VAT, 세금계산서, 취소 기준을 결제 전 확인하는 Deep Survey 요금제.">
+    <meta property="og:url" content="https://17f298fdeb1ff9.lhr.life/demo/pricing.html">
+    <meta property="og:image" content="https://17f298fdeb1ff9.lhr.life/demo/issue-bg-city.png">
+    <meta property="og:image:secure_url" content="https://17f298fdeb1ff9.lhr.life/demo/issue-bg-city.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1280">
+    <meta property="og:image:height" content="720">
+    <meta property="og:image:alt" content="Deep Survey 요금제와 결제 전 확인 안내 미리보기">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Deep Survey 요금제 | 원화 결제">
+    <meta name="twitter:description" content="플랜 선택 전 주문 확인·원화/VAT·세금계산서·취소 기준을 먼저 확인합니다.">
+    <meta name="twitter:image" content="https://17f298fdeb1ff9.lhr.life/demo/issue-bg-city.png">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20260520bb">
+    <style>
+        .pricing-page {
+            padding-bottom: 48px;
+        }
+
+        .pricing-overview {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: end;
+            margin-bottom: 24px;
+        }
+
+        .pricing-eyebrow {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .pricing-overview h1 {
+            font-size: clamp(28px, 5vw, 44px);
+            line-height: 1.05;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 0;
+        }
+
+        .pricing-overview p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .billing-summary {
+            min-width: 240px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 18px;
+        }
+
+        .billing-summary span {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .billing-summary strong {
+            display: block;
+            font-size: 20px;
+            line-height: 1.2;
+        }
+
+        .pricing-checkout-trust {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin: 0 0 22px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-secondary);
+        }
+
+        .pricing-checkout-trust span {
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+            min-width: 0;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .pricing-checkout-trust strong {
+            display: block;
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .pricing-checkout-trust span::before {
+            content: '';
+            flex: 0 0 8px;
+            width: 8px;
+            height: 8px;
+            margin-top: 5px;
+            border-radius: 9999px;
+            background: var(--brand-blue);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            margin: 30px 0 16px;
+        }
+
+        .section-title span {
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .plans-grid,
+        .feature-grid,
+        .package-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .plans-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .feature-grid {
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+
+        .package-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .plan-card,
+        .feature-card,
+        .package-card,
+        .enterprise-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .plan-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 360px;
+            position: relative;
+        }
+
+        .plan-card.featured {
+            border-color: var(--brand-blue);
+            box-shadow: 0 0 0 1px rgba(0, 82, 255, .18);
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: var(--brand-blue);
+            color: #fff;
+            border-radius: 9999px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .plan-name {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .plan-desc {
+            min-height: 42px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        .plan-price {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .plan-price strong {
+            font-size: 34px;
+            line-height: 1;
+            font-weight: 800;
+        }
+
+        .plan-price span {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .annual-price {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+
+        .plan-features {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin: 16px 0 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            flex: 1;
+        }
+
+        .plan-feature,
+        .enterprise-feature {
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .plan-feature::before,
+        .enterprise-feature::before {
+            content: '';
+            display: inline-block;
+            width: 10px;
+            height: 6px;
+            border-right: 2px solid var(--text-secondary);
+            border-bottom: 2px solid var(--text-secondary);
+            margin-right: 9px;
+            transform: translateY(-2px) rotate(45deg);
+        }
+
+        .plan-cta,
+        .enterprise-cta {
+            width: 100%;
+            border: 1px solid var(--text-primary);
+            border-radius: 9999px;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            cursor: pointer;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 12px 18px;
+            transition: opacity .15s, transform .15s;
+        }
+
+        .plan-cta.secondary {
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .plan-cta:hover,
+        .enterprise-cta:hover {
+            opacity: .82;
+            transform: translateY(-1px);
+        }
+
+        .feature-card h3,
+        .package-card h3 {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p,
+        .package-card p {
+            color: var(--text-secondary);
+            font-size: 12px;
+            line-height: 1.55;
+            margin-bottom: 14px;
+        }
+
+        .item-price {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+        }
+
+        .item-price strong {
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        .item-price span {
+            color: var(--text-secondary);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .package-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .package-card .item-price {
+            margin-top: auto;
+        }
+
+        .enterprise-card {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .enterprise-card h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .enterprise-card p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+
+        .enterprise-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 18px;
+        }
+
+        .enterprise-cta {
+            min-width: 160px;
+        }
+
+        @media (max-width: 900px) {
+            .pricing-overview,
+            .enterprise-card {
+                grid-template-columns: 1fr;
+            }
+
+            .plans-grid,
+            .package-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .pricing-checkout-trust {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+
+            .pricing-checkout-trust strong {
+                white-space: normal;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container pricing-page">
+        <header class="header">
+            <div class="logo">
+                <a href="index.html" class="logo-link" aria-label="Deep Survey beta 홈">
+                    <img class="brand-logo-icon brand-logo-light" src="logo-icon.png" alt="DS">
+                    <img class="brand-logo-icon brand-logo-dark" src="logo-icon-dark.png" alt="DS">
+                    <span class="brand-logo-lockup"><span class="brand-logo-name">Deep Survey</span><sup class="brand-beta-mark" aria-label="beta">β</sup></span>
+                </a>
+            </div>
+            <div class="header-actions">
+                <a href="index.html" class="nav-tab">← 메인</a>
+                <button class="auth-pill account-entry" type="button" id="my-page-button" onclick="openMyPage()" hidden aria-label="내 계정"></button>
+                <button class="auth-pill" type="button" id="login-button" onclick="openLogin()">로그인</button>
+            </div>
+        </header>
+
+        <section class="pricing-overview">
+            <div>
+                <div class="pricing-eyebrow">결제</div>
+                <h1>원화 기준 요금제</h1>
+                <p>월 구독, 연 결제, 건별 이용권을 모두 한화 기준으로 정리했습니다.</p>
+            </div>
+            <div class="billing-summary">
+                <span>표시 가격</span>
+                <strong>VAT 별도 · 원화 결제</strong>
+            </div>
+        </section>
+
+        <section class="pricing-checkout-trust" id="pricing-checkout-trust" aria-label="결제 전 확인 안내">
+            <span><strong>로그인 후 결제 전 주문 확인</strong>플랜을 눌러도 바로 청구되지 않고 계정 확인 다음 주문서를 검토합니다.</span>
+            <span><strong>VAT 별도 · 원화 결제</strong>표시가는 부가세 별도이며 결제 단계에서 총액을 다시 보여줍니다.</span>
+            <span><strong>세금계산서 · 언제든 취소</strong>팀 결제 증빙과 플랜 변경/취소 흐름을 설정에서 관리합니다.</span>
+        </section>
+
+        <section>
+            <h2 class="section-title">구독 플랜 <span>개인 및 소규모 팀</span></h2>
+            <div class="plans-grid">
+                <article class="plan-card">
+                    <div class="plan-name">Free</div>
+                    <p class="plan-desc">소규모 정책 검토를 위한 스타터 플랜</p>
+                    <div class="plan-price"><strong>₩0</strong><span>/월</span></div>
+                    <div class="annual-price">신용카드 등록 없이 시작</div>
+                    <div class="plan-features">
+                        <div class="plan-feature">이슈 리뷰 1건 무료</div>
+                        <div class="plan-feature">기본 교차 분석</div>
+                        <div class="plan-feature">12인 배심원 요약</div>
+                    </div>
+                    <button class="plan-cta secondary">현재 플랜</button>
+                </article>
+
+                <article class="plan-card featured">
+                    <span class="plan-badge">추천</span>
+                    <div class="plan-name">Pro</div>
+                    <p class="plan-desc">정기적으로 이슈를 검토하는 리서치 실무자용</p>
+                    <div class="plan-price"><strong>₩29,000</strong><span>/월</span></div>
+                    <div class="annual-price">연 결제 ₩290,000</div>
+                    <div class="plan-features">
+                        <div class="plan-feature">이슈 리뷰 무제한</div>
+                        <div class="plan-feature">Survey Design 포함</div>
+                        <div class="plan-feature">PoI 검증 포함</div>
+                        <div class="plan-feature">표본 500명까지 확장</div>
+                    </div>
+                    <button class="plan-cta" aria-describedby="pricing-checkout-trust">Pro 시작하기</button>
+                </article>
+
+                <article class="plan-card">
+                    <div class="plan-name">Max</div>
+                    <p class="plan-desc">심층 인터뷰와 대규모 표본까지 쓰는 팀용</p>
+                    <div class="plan-price"><strong>₩79,000</strong><span>/월</span></div>
+                    <div class="annual-price">연 결제 ₩790,000</div>
+                    <div class="plan-features">
+                        <div class="plan-feature">Pro의 모든 기능</div>
+                        <div class="plan-feature">IDI 분석 포함</div>
+                        <div class="plan-feature">FGI 리포트 포함</div>
+                        <div class="plan-feature">표본 2,000명까지 확장</div>
+                        <div class="plan-feature">우선 지원</div>
+                    </div>
+                    <button class="plan-cta" aria-describedby="pricing-checkout-trust">Max 시작하기</button>
+                </article>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">건별 이용 <span>필요할 때만 결제</span></h2>
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <h3>Survey Design</h3>
+                    <p>심층 설문 문항, 응답 척도, 질문 순서를 자동 설계합니다.</p>
+                    <div class="item-price"><strong>₩30,000</strong><span>/건</span></div>
+                </article>
+                <article class="feature-card">
+                    <h3>PoI 검증</h3>
+                    <p>실제 패널 검증 응답을 반영해 예측 신뢰도를 보정합니다.</p>
+                    <div class="item-price"><strong>₩20,000</strong><span>/건</span></div>
+                </article>
+                <article class="feature-card">
+                    <h3>IDI 분석</h3>
+                    <p>12인 페르소나에게 후속 질문을 던지는 인터뷰 세션입니다.</p>
+                    <div class="item-price"><strong>₩50,000</strong><span>/세션</span></div>
+                </article>
+                <article class="feature-card">
+                    <h3>FGI 리포트</h3>
+                    <p>관련 질문 10개로 토론 흐름과 핵심 쟁점을 정리합니다.</p>
+                    <div class="item-price"><strong>₩40,000</strong><span>/건</span></div>
+                </article>
+                <article class="feature-card">
+                    <h3>표본 확장</h3>
+                    <p>분석 표본을 2,000명 규모까지 넓혀 세그먼트 흔들림을 줄입니다.</p>
+                    <div class="item-price"><strong>₩20,000</strong><span>/회</span></div>
+                </article>
+                <article class="feature-card">
+                    <h3>배심원 확장</h3>
+                    <p>12인 기본 배심원을 120명 규모의 페르소나 군으로 확장합니다.</p>
+                    <div class="item-price"><strong>₩50,000</strong><span>/회</span></div>
+                </article>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">이용권 패키지 <span>선불형 원화 패키지</span></h2>
+            <div class="package-grid">
+                <article class="package-card">
+                    <h3>Starter</h3>
+                    <p>이슈 리뷰와 가벼운 검증을 묶어 쓰는 개인용 패키지</p>
+                    <div class="item-price"><strong>₩79,000</strong><span>10건</span></div>
+                </article>
+                <article class="package-card">
+                    <h3>Team</h3>
+                    <p>여러 캠페인과 정책 안건을 함께 보는 팀용 패키지</p>
+                    <div class="item-price"><strong>₩199,000</strong><span>30건</span></div>
+                </article>
+                <article class="package-card">
+                    <h3>Research</h3>
+                    <p>정기 리포트와 대량 검증을 묶은 리서치 패키지</p>
+                    <div class="item-price"><strong>₩590,000</strong><span>100건</span></div>
+                </article>
+            </div>
+        </section>
+
+        <section class="enterprise-card">
+            <div>
+                <h2>Enterprise</h2>
+                <p>전용 API, 커스텀 패널, 내부망 배포, 담당 매니저가 필요한 조직용 플랜입니다.</p>
+                <div class="enterprise-features">
+                    <span class="enterprise-feature">전용 API</span>
+                    <span class="enterprise-feature">커스텀 패널</span>
+                    <span class="enterprise-feature">SLA 보장</span>
+                    <span class="enterprise-feature">보안 검토 지원</span>
+                </div>
+            </div>
+            <button class="enterprise-cta">문의하기</button>
+        </section>
+
+        <footer class="footer">Deep Survey | Billing | 2026.05.18</footer>
+    </div>
+
+    <script src="common-ui.js?v=20260520t"></script>
+</body>
+
+</html>

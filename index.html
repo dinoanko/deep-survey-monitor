@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Survey | 정책 반응 인텔리전스</title>
+    <meta name="description" content="정책·메시지 발표 전 이해관계자 반응, 표본 설계, 프레임 취약점, 검증 질문을 감사 가능한 방식으로 점검하는 Deep Survey 정책 반응 시뮬레이션입니다.">
+    <meta name="theme-color" content="#111827">
+    <link rel="canonical" href="https://17f298fdeb1ff9.lhr.life/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Deep Survey">
+    <meta property="og:title" content="Deep Survey | 정책 반응 인텔리전스">
+    <meta property="og:description" content="정책 발표 전 이해관계자 반응과 메시지 리스크를 표본 설계와 감사 카드로 점검합니다.">
+    <meta property="og:url" content="https://17f298fdeb1ff9.lhr.life/">
+    <meta property="og:image" content="https://17f298fdeb1ff9.lhr.life/demo/issue-bg-city.png">
+    <meta property="og:image:secure_url" content="https://17f298fdeb1ff9.lhr.life/demo/issue-bg-city.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1280">
+    <meta property="og:image:height" content="720">
+    <meta property="og:image:alt" content="Deep Survey 정책 반응 인텔리전스 미리보기">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Deep Survey | 정책 반응 인텔리전스">
+    <meta name="twitter:description" content="정책 이슈를 표본감사와 함께 사전 점검하는 Deep Survey 시뮬레이션.">
+    <meta name="twitter:image" content="https://17f298fdeb1ff9.lhr.life/demo/issue-bg-city.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        window.DEEP_SURVEY_ASSET_BASE = (() => {
+            const path = window.location.pathname.replace(/\\/g, '/');
+            if (window.location.protocol === 'file:' || path.includes('/demo/')) return '';
+            return '/demo/';
+        })();
+        document.write(`<link rel="stylesheet" href="${window.DEEP_SURVEY_ASSET_BASE}styles.css?v=20260520bb">`);
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-demo-src]').forEach(el => {
+                el.setAttribute('src', `${window.DEEP_SURVEY_ASSET_BASE}${el.dataset.demoSrc}`);
+            });
+            document.querySelectorAll('[data-demo-href]').forEach(el => {
+                el.setAttribute('href', `${window.DEEP_SURVEY_ASSET_BASE}${el.dataset.demoHref}`);
+            });
+        });
+    </script>
+</head>
+
+<body class="audience-b2c">
+    <div class="container">
+        <header class="header">
+            <div class="header-user-actions">
+                <button class="auth-pill account-entry" type="button" id="my-page-button" onclick="openMyPage()" hidden aria-label="내 계정"></button>
+                <button class="auth-pill" type="button" id="login-button" onclick="openLogin()">로그인</button>
+            </div>
+            <div class="logo">
+                <a href="index.html" data-demo-href="index.html" class="logo-link" aria-label="Deep Survey beta 홈">
+                    <img class="brand-logo-icon brand-logo-light" src="logo-icon.png" data-demo-src="logo-icon.png" alt="DS">
+                    <img class="brand-logo-icon brand-logo-dark" src="logo-icon-dark.png" data-demo-src="logo-icon-dark.png" alt="DS">
+                    <span class="brand-logo-lockup"><span class="brand-logo-name">Deep Survey</span><sup class="brand-beta-mark" aria-label="beta">β</sup></span>
+                </a>
+            </div>
+            <div class="header-actions">
+                <div class="audience-switcher" role="tablist" aria-label="화면 유형">
+                    <button class="audience-mode audience-home active" type="button" data-audience-mode="b2c" role="tab" aria-selected="true" aria-label="홈" title="홈" onclick="selectAudienceMode('b2c')"><span class="mono-icon mono-icon-home" aria-hidden="true"></span><span class="sr-only">이슈 라이브러리</span></button>
+                    <button class="audience-mode" type="button" data-audience-mode="forecast" role="tab" aria-selected="false" onclick="selectAudienceMode('forecast')"><span class="mono-icon mono-icon-chart" aria-hidden="true"></span><span>예측</span></button>
+                    <button class="audience-mode audience-sim" type="button" data-audience-mode="b2b" role="tab" aria-selected="false" onclick="selectAudienceMode('b2b')"><span class="audience-ds-logo" aria-hidden="true"><img class="audience-ds-icon audience-ds-icon-light" src="logo-icon.png" data-demo-src="logo-icon.png" alt=""><img class="audience-ds-icon audience-ds-icon-dark" src="logo-icon-dark.png" data-demo-src="logo-icon-dark.png" alt=""></span><span>시뮬레이션</span></button>
+                </div>
+            </div>
+        </header>
+
+        <div id="survey-content" class="panel-content active">
+
+            <div class="trending-section">
+                <div class="trending-header" data-radar-toggle aria-expanded="false" onclick="toggleIssueRadarVertical(event)">
+                    <h3><span class="pulse"></span> 이슈 레이더</h3>
+                    <div class="trend-refresh-status">
+                        <span id="trend-refresh-status" aria-live="polite">오전 09:45</span>
+                        <span class="trend-powered trend-powered-header">Powered by 1mm</span>
+                        <button class="trend-refresh-control" type="button" onclick="toggleLiveIssueAutoRefresh()" aria-label="이슈 레이더 일시정지" aria-pressed="false"><span class="trend-control-icon is-pause" aria-hidden="true"></span></button>
+                    </div>
+                </div>
+                <div class="trending-list">
+                    <div class="trending-item" role="button" tabindex="0" aria-label="삼성전자 긴급조정권 이슈 레이더 펼치기" onclick="handleTrendingIssueActivate(event, 'samsung_strike')" onkeydown="handleTrendingIssueOpenKey(event, 'samsung_strike')"><span class="trend-rank gold">1위</span>
+                        <div class="trend-info"><span class="trend-name">삼성전자 긴급조정권</span></div><span class="trend-change trend-up">↑156%</span></div>
+                    <div class="trending-item" role="button" tabindex="0" aria-label="사회적 약자 범죄 엄벌 이슈 레이더 펼치기" onclick="handleTrendingIssueActivate(event, 'crime_penalty')" onkeydown="handleTrendingIssueOpenKey(event, 'crime_penalty')"><span class="trend-rank silver">2위</span>
+                        <div class="trend-info"><span class="trend-name">사회적 약자 범죄 엄벌</span></div><span class="trend-change trend-new">신규</span></div>
+                    <div class="trending-item" role="button" tabindex="0" aria-label="금투세 재추진 이슈 레이더 펼치기" onclick="handleTrendingIssueActivate(event, 'kospi_tax')" onkeydown="handleTrendingIssueOpenKey(event, 'kospi_tax')"><span class="trend-rank bronze">3위</span>
+                        <div class="trend-info"><span class="trend-name">금투세 재추진</span></div><span class="trend-change trend-up">↑42%</span></div>
+                    <div class="trending-item" role="button" tabindex="0" aria-label="인천공항 주차 특혜 이슈 레이더 펼치기" onclick="handleTrendingIssueActivate(event, 'airport_parking')" onkeydown="handleTrendingIssueOpenKey(event, 'airport_parking')"><span class="trend-rank">4위</span>
+                        <div class="trend-info"><span class="trend-name">인천공항 주차 특혜</span></div><span class="trend-change trend-new">신규</span></div>
+                    <div class="trending-item" role="button" tabindex="0" aria-label="서울 아파트값 상승 이슈 레이더 펼치기" onclick="handleTrendingIssueActivate(event, 'seoul_apt')" onkeydown="handleTrendingIssueOpenKey(event, 'seoul_apt')"><span class="trend-rank">5위</span>
+                        <div class="trend-info"><span class="trend-name">서울 아파트값 상승</span></div><span class="trend-change trend-up">↑18%</span></div>
+                    <div class="trending-item" role="button" tabindex="0" aria-label="교권 보호 강화 이슈 레이더 펼치기" onclick="handleTrendingIssueActivate(event, 'teacher_protect')" onkeydown="handleTrendingIssueOpenKey(event, 'teacher_protect')"><span class="trend-rank">6위</span>
+                        <div class="trend-info"><span class="trend-name">교권 보호 강화</span></div><span class="trend-change trend-new">신규</span></div>
+                    <div class="trending-item" role="button" tabindex="0" aria-label="고금리 대부업 규제 이슈 레이더 펼치기" onclick="handleTrendingIssueActivate(event, 'usury_ban')" onkeydown="handleTrendingIssueOpenKey(event, 'usury_ban')"><span class="trend-rank">7위</span>
+                        <div class="trend-info"><span class="trend-name">고금리 대부업 규제</span></div><span class="trend-change trend-new">신규</span></div>
+                    <div class="trending-item" role="button" tabindex="0" aria-label="현대차 부품노조 파업 이슈 레이더 펼치기" onclick="handleTrendingIssueActivate(event, 'hyundai_strike')" onkeydown="handleTrendingIssueOpenKey(event, 'hyundai_strike')"><span class="trend-rank">8위</span>
+                        <div class="trend-info"><span class="trend-name">현대차 부품노조 파업</span></div><span class="trend-change trend-new">신규</span></div>
+                    <div class="trending-item" role="button" tabindex="0" aria-label="설탕 부담금 이슈 레이더 펼치기" onclick="handleTrendingIssueActivate(event, 'sugar')" onkeydown="handleTrendingIssueOpenKey(event, 'sugar')"><span class="trend-rank">9위</span>
+                        <div class="trend-info"><span class="trend-name">설탕 부담금</span></div><span class="trend-change trend-up">↑28%</span></div>
+                    <div class="trending-item" role="button" tabindex="0" aria-label="AI 국민배당금 이슈 레이더 펼치기" onclick="handleTrendingIssueActivate(event, 'ai_dividend')" onkeydown="handleTrendingIssueOpenKey(event, 'ai_dividend')"><span class="trend-rank">10위</span>
+                        <div class="trend-info"><span class="trend-name">AI 국민배당금</span></div><span class="trend-change trend-up">↑35%</span></div>
+                </div>
+            </div>
+
+            <div class="hot-section">
+                <div class="hot-header">
+                    <h3><span class="hot-badge">LIVE</span> 이슈 브리핑</h3>
+                </div>
+                <div class="hot-carousel">
+                    <div class="hot-card" role="button" tabindex="0" aria-label="삼성전자 파업에 긴급조정권을 발동해야 하나 상세 보기" onclick="openModal('samsung_strike')" onkeydown="handleIssueOpenKey(event, 'samsung_strike')">
+                        <div class="hot-card-header"><span class="cat">노동</span><span class="fire"><span class="mono-icon mono-icon-hot" aria-hidden="true"></span></span></div>
+                        <h4>삼성전자 파업에 긴급조정권을 발동해야 하나</h4>
+                        <p class="hot-card-trust">출처 검증 대기 · 현재 여론 수치 아님</p>
+                        <div class="stats"><span><span class="mono-icon mono-icon-eye" aria-hidden="true"></span> 28,400</span><span><span class="mono-icon mono-icon-comment" aria-hidden="true"></span> 12,840</span></div></div>
+                    <div class="hot-card" role="button" tabindex="0" aria-label="사회적 약자 대상 범죄 양형 강화 찬반 상세 보기" onclick="openModal('crime_penalty')" onkeydown="handleIssueOpenKey(event, 'crime_penalty')">
+                        <div class="hot-card-header"><span class="cat">사회</span><span class="fire"><span class="mono-icon mono-icon-hot" aria-hidden="true"></span></span></div>
+                        <h4>사회적 약자 대상 범죄 양형 강화 찬반</h4>
+                        <p class="hot-card-trust">출처 검증 대기 · 현재 여론 수치 아님</p>
+                        <div class="stats"><span><span class="mono-icon mono-icon-eye" aria-hidden="true"></span> 14,200</span><span><span class="mono-icon mono-icon-comment" aria-hidden="true"></span> 5,680</span></div></div>
+                    <div class="hot-card" role="button" tabindex="0" aria-label="코스피 8000 앞두고 금투세 재추진 찬반 상세 보기" onclick="openModal('kospi_tax')" onkeydown="handleIssueOpenKey(event, 'kospi_tax')">
+                        <div class="hot-card-header"><span class="cat">경제</span><span class="fire"><span class="mono-icon mono-icon-hot" aria-hidden="true"></span></span></div>
+                        <h4>코스피 8000 앞두고 금투세 재추진 찬반</h4>
+                        <p class="hot-card-trust">출처 검증 대기 · 현재 여론 수치 아님</p>
+                        <div class="stats"><span><span class="mono-icon mono-icon-eye" aria-hidden="true"></span> 12,800</span><span><span class="mono-icon mono-icon-comment" aria-hidden="true"></span> 4,920</span></div></div>
+                    <div class="hot-card" role="button" tabindex="0" aria-label="인천공항 직원 주차 특혜 폐지 찬반 상세 보기" onclick="openModal('airport_parking')" onkeydown="handleIssueOpenKey(event, 'airport_parking')">
+                        <div class="hot-card-header"><span class="cat">행정</span><span class="fire"><span class="mono-icon mono-icon-bolt" aria-hidden="true"></span></span></div>
+                        <h4>인천공항 직원 주차 특혜 폐지 찬반</h4>
+                        <p class="hot-card-trust">출처 검증 대기 · 현재 여론 수치 아님</p>
+                        <div class="stats"><span><span class="mono-icon mono-icon-eye" aria-hidden="true"></span> 8,900</span><span><span class="mono-icon mono-icon-comment" aria-hidden="true"></span> 3,420</span></div></div>
+                    <div class="hot-card" role="button" tabindex="0" aria-label="서울 25개구 아파트값 동반 상승 대응 상세 보기" onclick="openModal('seoul_apt')" onkeydown="handleIssueOpenKey(event, 'seoul_apt')">
+                        <div class="hot-card-header"><span class="cat">부동산</span><span class="fire"><span class="mono-icon mono-icon-hot" aria-hidden="true"></span></span></div>
+                        <h4>서울 25개구 아파트값 동반 상승 대응</h4>
+                        <p class="hot-card-trust">출처 검증 대기 · 현재 여론 수치 아님</p>
+                        <div class="stats"><span><span class="mono-icon mono-icon-eye" aria-hidden="true"></span> 8,500</span><span><span class="mono-icon mono-icon-comment" aria-hidden="true"></span> 3,200</span></div></div>
+                    <div class="hot-card" role="button" tabindex="0" aria-label="교권 보호법 강화 찬반 — 교사 55% 사직 고민 상세 보기" onclick="openModal('teacher_protect')" onkeydown="handleIssueOpenKey(event, 'teacher_protect')">
+                        <div class="hot-card-header"><span class="cat">교육</span><span class="fire"><span class="mono-icon mono-icon-bolt" aria-hidden="true"></span></span></div>
+                        <h4>교권 보호법 강화 찬반 — 교사 55% 사직 고민</h4>
+                        <p class="hot-card-trust">출처 검증 대기 · 현재 여론 수치 아님</p>
+                        <div class="stats"><span><span class="mono-icon mono-icon-eye" aria-hidden="true"></span> 6,700</span><span><span class="mono-icon mono-icon-comment" aria-hidden="true"></span> 2,890</span></div></div>
+                    <div class="hot-card" role="button" tabindex="0" aria-label="고금리 60% 이상 이자 원금 무효화 찬반 상세 보기" onclick="openModal('usury_ban')" onkeydown="handleIssueOpenKey(event, 'usury_ban')">
+                        <div class="hot-card-header"><span class="cat">금융</span><span class="fire"><span class="mono-icon mono-icon-bolt" aria-hidden="true"></span></span></div>
+                        <h4>고금리 60% 이상 이자 원금 무효화 찬반</h4>
+                        <p class="hot-card-trust">출처 검증 대기 · 현재 여론 수치 아님</p>
+                        <div class="stats"><span><span class="mono-icon mono-icon-eye" aria-hidden="true"></span> 6,200</span><span><span class="mono-icon mono-icon-comment" aria-hidden="true"></span> 2,400</span></div></div>
+                    <div class="hot-card" role="button" tabindex="0" aria-label="현대차 부품운송 파업 — 필수유지업무 찬반 상세 보기" onclick="openModal('hyundai_strike')" onkeydown="handleIssueOpenKey(event, 'hyundai_strike')">
+                        <div class="hot-card-header"><span class="cat">노동</span><span class="fire"><span class="mono-icon mono-icon-bolt" aria-hidden="true"></span></span></div>
+                        <h4>현대차 부품운송 파업 — 필수유지업무 찬반</h4>
+                        <p class="hot-card-trust">출처 검증 대기 · 현재 여론 수치 아님</p>
+                        <div class="stats"><span><span class="mono-icon mono-icon-eye" aria-hidden="true"></span> 5,400</span><span><span class="mono-icon mono-icon-comment" aria-hidden="true"></span> 1,800</span></div></div>
+                    <div class="hot-card" role="button" tabindex="0" aria-label="AI 초과세수 국민배당금 논쟁 상세 보기" onclick="openModal('ai_dividend')" onkeydown="handleIssueOpenKey(event, 'ai_dividend')">
+                        <div class="hot-card-header"><span class="cat">재정</span><span class="fire"><span class="mono-icon mono-icon-hot" aria-hidden="true"></span></span></div>
+                        <h4>AI 초과세수 국민배당금 논쟁</h4>
+                        <p class="hot-card-trust">출처 검증 대기 · 현재 여론 수치 아님</p>
+                        <div class="stats"><span><span class="mono-icon mono-icon-eye" aria-hidden="true"></span> 4,400</span><span><span class="mono-icon mono-icon-comment" aria-hidden="true"></span> 1,600</span></div></div>
+                    <div class="hot-card" role="button" tabindex="0" aria-label="나무호 피격 — 이란 강경 외교 대응 찬반 상세 보기" onclick="openModal('namu_iran')" onkeydown="handleIssueOpenKey(event, 'namu_iran')">
+                        <div class="hot-card-header"><span class="cat">외교</span><span class="fire"><span class="mono-icon mono-icon-bolt" aria-hidden="true"></span></span></div>
+                        <h4>나무호 피격 — 이란 강경 외교 대응 찬반</h4>
+                        <p class="hot-card-trust">출처 검증 대기 · 현재 여론 수치 아님</p>
+                        <div class="stats"><span><span class="mono-icon mono-icon-eye" aria-hidden="true"></span> 3,800</span><span><span class="mono-icon mono-icon-comment" aria-hidden="true"></span> 1,200</span></div></div>
+                </div>
+            </div>
+
+            <section class="forecast-vote-section" id="forecast-vote-section" aria-labelledby="forecast-vote-title">
+                <div class="forecast-vote-header">
+                    <div>
+                        <span class="forecast-vote-kicker">FORECAST VOTE</span>
+                        <h3 id="forecast-vote-title">투표형 예측</h3>
+                    </div>
+                    <div class="forecast-vote-badge">거래 없음 · 집단전망</div>
+                </div>
+                <div class="forecast-vote-shell">
+                    <div id="forecast-market-list" class="forecast-market-list" aria-label="예측 투표 목록"></div>
+                    <div id="forecast-market-detail" class="forecast-market-detail" aria-live="polite"></div>
+                </div>
+            </section>
+
+            <section class="issue-section" id="issues">
+
+            <div class="issue-grid">
+                <div class="issue-card hot" role="button" tabindex="0" aria-label="삼성전자 파업 긴급조정권 발동 상세 보기" onkeydown="handleIssueOpenKey(event, 'samsung_strike')" onclick="openModal('samsung_strike')">
+                    <div class="issue-card-header"><span class="issue-category cat-economy">노동</span>
+                        <h3 class="issue-title">삼성전자 파업 긴급조정권 발동</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 참여 데이터 수집 중</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 방금</span></div>
+                    </div>
+                    <div class="issue-card-body">
+                        <div class="scale-bar">
+                            <div class="scale-strongly-agree" style="width:32%"></div>
+                            <div class="scale-agree" style="width:24%"></div>
+                            <div class="scale-disagree" style="width:19%"></div>
+                            <div class="scale-strongly-disagree" style="width:16%"></div>
+                            <div class="scale-unsure" style="width:9%"></div>
+                        </div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 56%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 35%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 9%</span></div>
+                    </div>
+                </div>
+                <div class="issue-card hot" role="button" tabindex="0" aria-label="사회적 약자 대상 범죄 엄벌법 상세 보기" onkeydown="handleIssueOpenKey(event, 'crime_penalty')" onclick="openModal('crime_penalty')">
+                    <div class="issue-card-header"><span class="issue-category cat-politics">사회</span>
+                        <h3 class="issue-title">사회적 약자 대상 범죄 엄벌법</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 1,800명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 방금</span></div>
+                    </div>
+                    <div class="issue-card-body">
+                        <div class="scale-bar">
+                            <div class="scale-strongly-agree" style="width:48%"></div>
+                            <div class="scale-agree" style="width:28%"></div>
+                            <div class="scale-disagree" style="width:10%"></div>
+                            <div class="scale-strongly-disagree" style="width:6%"></div>
+                            <div class="scale-unsure" style="width:8%"></div>
+                        </div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 76%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 16%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 8%</span></div>
+                    </div>
+                </div>
+                <div class="issue-card new" role="button" tabindex="0" aria-label="인천공항 직원 주차 특혜 폐지 상세 보기" onkeydown="handleIssueOpenKey(event, 'airport_parking')" onclick="openModal('airport_parking')">
+                    <div class="issue-card-header"><span class="issue-category cat-industry">행정</span>
+                        <h3 class="issue-title">인천공항 직원 주차 특혜 폐지</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 1,500명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 방금</span></div>
+                    </div>
+                    <div class="issue-card-body">
+                        <div class="scale-bar">
+                            <div class="scale-strongly-agree" style="width:53%"></div>
+                            <div class="scale-agree" style="width:24%"></div>
+                            <div class="scale-disagree" style="width:9%"></div>
+                            <div class="scale-strongly-disagree" style="width:6%"></div>
+                            <div class="scale-unsure" style="width:8%"></div>
+                        </div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 77%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 15%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 8%</span></div>
+                    </div>
+                </div>
+                <div class="issue-card new" role="button" tabindex="0" aria-label="교권 보호 강화법 — 학생 폭행·폭언 대응 상세 보기" onkeydown="handleIssueOpenKey(event, 'teacher_protect')" onclick="openModal('teacher_protect')">
+                    <div class="issue-card-header"><span class="issue-category cat-welfare">교육</span>
+                        <h3 class="issue-title">교권 보호 강화법 — 학생 폭행·폭언 대응</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 1,200명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 방금</span></div>
+                    </div>
+                    <div class="issue-card-body">
+                        <div class="scale-bar">
+                            <div class="scale-strongly-agree" style="width:55%"></div>
+                            <div class="scale-agree" style="width:26%"></div>
+                            <div class="scale-disagree" style="width:8%"></div>
+                            <div class="scale-strongly-disagree" style="width:4%"></div>
+                            <div class="scale-unsure" style="width:7%"></div>
+                        </div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 81%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 12%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 7%</span></div>
+                    </div>
+                </div>
+                <div class="issue-card hot" role="button" tabindex="0" aria-label="설탕 부담금 도입 - 가당음료 1L당 100원 상세 보기" onkeydown="handleIssueOpenKey(event, 'sugar')" onclick="openModal('sugar')">
+                    <div class="issue-card-header"><span class="issue-category cat-welfare">보건</span>
+                        <h3 class="issue-title">설탕 부담금 도입 - 가당음료 1L당 100원</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 1,200명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 2시간 전</span></div>
+                    </div>
+                    <div class="issue-card-body">
+                        <div class="scale-bar">
+                            <div class="scale-strongly-agree" style="width:11%"></div>
+                            <div class="scale-agree" style="width:27%"></div>
+                            <div class="scale-disagree" style="width:31%"></div>
+                            <div class="scale-strongly-disagree" style="width:17%"></div>
+                            <div class="scale-unsure" style="width:14%"></div>
+                        </div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span>
+                                38%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 48%</span><span
+                                class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 14%</span></div>
+                    </div>
+                </div>
+                <div class="issue-card hot" role="button" tabindex="0" aria-label="다주택자 양도세 중과 복원안 상세 보기" onkeydown="handleIssueOpenKey(event, 'realestate')" onclick="openModal('realestate')">
+                    <div class="issue-card-header"><span class="issue-category cat-economy">부동산</span>
+                        <h3 class="issue-title">다주택자 양도세 중과 복원안</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 950명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 2/3</span></div>
+                    </div>
+                    <div class="issue-card-body">
+                        <div class="scale-bar">
+                            <div class="scale-strongly-agree" style="width:28%"></div>
+                            <div class="scale-agree" style="width:24%"></div>
+                            <div class="scale-disagree" style="width:22%"></div>
+                            <div class="scale-strongly-disagree" style="width:18%"></div>
+                            <div class="scale-unsure" style="width:8%"></div>
+                        </div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span>
+                                52%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 40%</span><span
+                                class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 8%</span></div>
+                    </div>
+                </div>
+                <div class="issue-card new" role="button" tabindex="0" aria-label="반도체특별법 - 세액공제 25% 확대 상세 보기" onkeydown="handleIssueOpenKey(event, 'semiconductor')" onclick="openModal('semiconductor')">
+                    <div class="issue-card-header"><span class="issue-category cat-industry">산업</span>
+                        <h3 class="issue-title">반도체특별법 - 세액공제 25% 확대</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 1,000명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 2/2</span></div>
+                    </div>
+                    <div class="issue-card-body">
+                        <div class="scale-bar">
+                            <div class="scale-strongly-agree" style="width:26%"></div>
+                            <div class="scale-agree" style="width:32%"></div>
+                            <div class="scale-disagree" style="width:18%"></div>
+                            <div class="scale-strongly-disagree" style="width:10%"></div>
+                            <div class="scale-unsure" style="width:14%"></div>
+                        </div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span>
+                                58%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 28%</span><span
+                                class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 14%</span></div>
+                    </div>
+                </div>
+                <div class="issue-card" role="button" tabindex="0" aria-label="온동네 초등돌봄 확대 - 3학년+ 방과후 상세 보기" onkeydown="handleIssueOpenKey(event, 'sugar')" onclick="openModal('sugar')">
+                    <div class="issue-card-header"><span class="issue-category cat-welfare">교육</span>
+                        <h3 class="issue-title">온동네 초등돌봄 확대 - 3학년+ 방과후</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 800명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 2/3</span></div>
+                    </div>
+                    <div class="issue-card-body">
+                        <div class="scale-bar">
+                            <div class="scale-strongly-agree" style="width:35%"></div>
+                            <div class="scale-agree" style="width:38%"></div>
+                            <div class="scale-disagree" style="width:12%"></div>
+                            <div class="scale-strongly-disagree" style="width:5%"></div>
+                            <div class="scale-unsure" style="width:10%"></div>
+                        </div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span>
+                                73%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 17%</span><span
+                                class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 10%</span></div>
+                    </div>
+                </div>
+                <div class="issue-card new" role="button" tabindex="0" aria-label="주 52시간 유연 적용 — 반도체·IT 업종 예외 상세 보기" onkeydown="handleIssueOpenKey(event, 'work52')" onclick="openModal('work52')">
+                    <div class="issue-card-header"><span class="issue-category cat-economy">노동</span>
+                        <h3 class="issue-title">주 52시간 유연 적용 — 반도체·IT 업종 예외</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 850명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 2/4</span></div>
+                    </div>
+                    <div class="issue-card-body">
+                        <div class="scale-bar">
+                            <div class="scale-strongly-agree" style="width:14%"></div>
+                            <div class="scale-agree" style="width:28%"></div>
+                            <div class="scale-disagree" style="width:28%"></div>
+                            <div class="scale-strongly-disagree" style="width:17%"></div>
+                            <div class="scale-unsure" style="width:13%"></div>
+                        </div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span>
+                                53%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 39%</span><span
+                                class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 8%</span></div>
+                    </div>
+                </div>
+                <div class="issue-card" role="button" tabindex="0" aria-label="2026 R&D 예산 35.5조 - AI/반도체 집중 상세 보기" onkeydown="handleIssueOpenKey(event, 'sugar')" onclick="openModal('sugar')">
+                    <div class="issue-card-header"><span class="issue-category cat-industry">과학기술</span>
+                        <h3 class="issue-title">2026 R&D 예산 35.5조 - AI/반도체 집중</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 700명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 2/4</span></div>
+                    </div>
+                    <div class="issue-card-body">
+                        <div class="scale-bar">
+                            <div class="scale-strongly-agree" style="width:32%"></div>
+                            <div class="scale-agree" style="width:35%"></div>
+                            <div class="scale-disagree" style="width:15%"></div>
+                            <div class="scale-strongly-disagree" style="width:6%"></div>
+                            <div class="scale-unsure" style="width:12%"></div>
+                        </div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span>
+                                67%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 21%</span><span
+                                class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 12%</span></div>
+                    </div>
+                </div>
+                <div class="issue-card new" role="button" tabindex="0" aria-label="현대차 부품운송노조 파업 상세 보기" onkeydown="handleIssueOpenKey(event, 'hyundai_strike')" onclick="openModal('hyundai_strike')">
+                    <div class="issue-card-header"><span class="issue-category cat-economy">노동</span>
+                        <h3 class="issue-title">현대차 부품운송노조 파업</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 900명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 4시간전</span></div>
+                    </div>
+                    <div class="issue-card-body"><div class="scale-bar"><div class="scale-strongly-agree" style="width:28%"></div><div class="scale-agree" style="width:23%"></div><div class="scale-disagree" style="width:24%"></div><div class="scale-strongly-disagree" style="width:17%"></div><div class="scale-unsure" style="width:8%"></div></div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 51%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 41%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 8%</span></div></div>
+                </div>
+                <div class="issue-card hot" role="button" tabindex="0" aria-label="철강업계 줄파산 — 50년 만에 최악 상세 보기" onkeydown="handleIssueOpenKey(event, 'steel_crisis')" onclick="openModal('steel_crisis')">
+                    <div class="issue-card-header"><span class="issue-category cat-industry">산업</span>
+                        <h3 class="issue-title">철강업계 줄파산 — 50년 만에 최악</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 700명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 6시간전</span></div>
+                    </div>
+                    <div class="issue-card-body"><div class="scale-bar"><div class="scale-strongly-agree" style="width:42%"></div><div class="scale-agree" style="width:28%"></div><div class="scale-disagree" style="width:13%"></div><div class="scale-strongly-disagree" style="width:8%"></div><div class="scale-unsure" style="width:9%"></div></div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 70%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 21%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 9%</span></div></div>
+                </div>
+                <div class="issue-card new" role="button" tabindex="0" aria-label="금투세 재추진 — 코스피 8000 앞두고 상세 보기" onkeydown="handleIssueOpenKey(event, 'kospi_tax')" onclick="openModal('kospi_tax')">
+                    <div class="issue-card-header"><span class="issue-category cat-economy">경제</span>
+                        <h3 class="issue-title">금투세 재추진 — 코스피 8000 앞두고</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 1,100명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 13시간전</span></div>
+                    </div>
+                    <div class="issue-card-body"><div class="scale-bar"><div class="scale-strongly-agree" style="width:25%"></div><div class="scale-agree" style="width:18%"></div><div class="scale-disagree" style="width:26%"></div><div class="scale-strongly-disagree" style="width:22%"></div><div class="scale-unsure" style="width:9%"></div></div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 43%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 48%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 9%</span></div></div>
+                </div>
+                <div class="issue-card hot" role="button" tabindex="0" aria-label="서울 25개구 아파트값 동반 상승 대응 상세 보기" onkeydown="handleIssueOpenKey(event, 'seoul_apt')" onclick="openModal('seoul_apt')">
+                    <div class="issue-card-header"><span class="issue-category cat-economy">부동산</span>
+                        <h3 class="issue-title">서울 25개구 아파트값 동반 상승 대응</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 1,400명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 10시간전</span></div>
+                    </div>
+                    <div class="issue-card-body"><div class="scale-bar"><div class="scale-strongly-agree" style="width:38%"></div><div class="scale-agree" style="width:24%"></div><div class="scale-disagree" style="width:19%"></div><div class="scale-strongly-disagree" style="width:12%"></div><div class="scale-unsure" style="width:7%"></div></div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 62%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 31%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 7%</span></div></div>
+                </div>
+                <div class="issue-card" role="button" tabindex="0" aria-label="고금리 대부업 규제 — 60% 이상 이자 원금 무효 상세 보기" onkeydown="handleIssueOpenKey(event, 'usury_ban')" onclick="openModal('usury_ban')">
+                    <div class="issue-card-header"><span class="issue-category cat-welfare">금융</span>
+                        <h3 class="issue-title">고금리 대부업 규제 — 60% 이상 이자 원금 무효</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 1,000명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 9시간전</span></div>
+                    </div>
+                    <div class="issue-card-body"><div class="scale-bar"><div class="scale-strongly-agree" style="width:58%"></div><div class="scale-agree" style="width:22%"></div><div class="scale-disagree" style="width:8%"></div><div class="scale-strongly-disagree" style="width:5%"></div><div class="scale-unsure" style="width:7%"></div></div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 80%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 13%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 7%</span></div></div>
+                </div>
+                <div class="issue-card" role="button" tabindex="0" aria-label="연명의료 중단 선택권 확대 상세 보기" onkeydown="handleIssueOpenKey(event, 'life_sustain')" onclick="openModal('life_sustain')">
+                    <div class="issue-card-header"><span class="issue-category cat-welfare">보건</span>
+                        <h3 class="issue-title">연명의료 중단 선택권 확대</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 600명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 6시간전</span></div>
+                    </div>
+                    <div class="issue-card-body"><div class="scale-bar"><div class="scale-strongly-agree" style="width:43%"></div><div class="scale-agree" style="width:26%"></div><div class="scale-disagree" style="width:12%"></div><div class="scale-strongly-disagree" style="width:9%"></div><div class="scale-unsure" style="width:10%"></div></div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 69%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 21%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 10%</span></div></div>
+                </div>
+                <div class="issue-card new" role="button" tabindex="0" aria-label="도수치료 건보 규제 — 7월 회당 4만원 상한 상세 보기" onkeydown="handleIssueOpenKey(event, 'dosu_regulate')" onclick="openModal('dosu_regulate')">
+                    <div class="issue-card-header"><span class="issue-category cat-welfare">의료</span>
+                        <h3 class="issue-title">도수치료 건보 규제 — 7월 회당 4만원 상한</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 800명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 6시간전</span></div>
+                    </div>
+                    <div class="issue-card-body"><div class="scale-bar"><div class="scale-strongly-agree" style="width:35%"></div><div class="scale-agree" style="width:25%"></div><div class="scale-disagree" style="width:20%"></div><div class="scale-strongly-disagree" style="width:12%"></div><div class="scale-unsure" style="width:8%"></div></div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 60%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 32%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 8%</span></div></div>
+                </div>
+                <div class="issue-card hot" role="button" tabindex="0" aria-label="AI 국민배당금 — 초과세수 활용 직접 배당 상세 보기" onkeydown="handleIssueOpenKey(event, 'ai_dividend')" onclick="openModal('ai_dividend')">
+                    <div class="issue-card-header"><span class="issue-category cat-politics">재정</span>
+                        <h3 class="issue-title">AI 국민배당금 — 초과세수 활용 직접 배당</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 1,300명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 14시간전</span></div>
+                    </div>
+                    <div class="issue-card-body"><div class="scale-bar"><div class="scale-strongly-agree" style="width:32%"></div><div class="scale-agree" style="width:21%"></div><div class="scale-disagree" style="width:22%"></div><div class="scale-strongly-disagree" style="width:16%"></div><div class="scale-unsure" style="width:9%"></div></div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 53%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 38%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 9%</span></div></div>
+                </div>
+                <div class="issue-card" role="button" tabindex="0" aria-label="홈플러스 폐점 도미노 & 지역경제 위기 상세 보기" onkeydown="handleIssueOpenKey(event, 'homeplus')" onclick="openModal('homeplus')">
+                    <div class="issue-card-header"><span class="issue-category cat-industry">유통</span>
+                        <h3 class="issue-title">홈플러스 폐점 도미노 & 지역경제 위기</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 650명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 3시간전</span></div>
+                    </div>
+                    <div class="issue-card-body"><div class="scale-bar"><div class="scale-strongly-agree" style="width:48%"></div><div class="scale-agree" style="width:26%"></div><div class="scale-disagree" style="width:11%"></div><div class="scale-strongly-disagree" style="width:7%"></div><div class="scale-unsure" style="width:8%"></div></div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 74%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 18%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 8%</span></div></div>
+                </div>
+                <div class="issue-card new" role="button" tabindex="0" aria-label="나무호 피격 — 이란 외교 대응 수위 상세 보기" onkeydown="handleIssueOpenKey(event, 'namu_iran')" onclick="openModal('namu_iran')">
+                    <div class="issue-card-header"><span class="issue-category cat-politics">외교</span>
+                        <h3 class="issue-title">나무호 피격 — 이란 외교 대응 수위</h3>
+                        <div class="issue-meta"><span><span class="mono-icon mono-icon-users" aria-hidden="true"></span> 750명</span><span><span class="mono-icon mono-icon-clock" aria-hidden="true"></span> 12시간전</span></div>
+                    </div>
+                    <div class="issue-card-body"><div class="scale-bar"><div class="scale-strongly-agree" style="width:34%"></div><div class="scale-agree" style="width:28%"></div><div class="scale-disagree" style="width:17%"></div><div class="scale-strongly-disagree" style="width:8%"></div><div class="scale-unsure" style="width:13%"></div></div>
+                        <div class="quick-stats"><span class="quick-stat" style="color:var(--accent-green)"><span class="mono-icon mono-icon-agree" aria-hidden="true"></span> 62%</span><span class="quick-stat" style="color:var(--accent-red)"><span class="mono-icon mono-icon-disagree" aria-hidden="true"></span> 25%</span><span class="quick-stat" style="color:var(--accent-gray)"><span class="mono-icon mono-icon-neutral" aria-hidden="true"></span> 13%</span></div></div>
+                </div>
+            </div>
+
+            <!-- ── Policy reaction simulation ── -->
+            <div class="custom-sim-section">
+                <div class="custom-sim-header">
+                    <h3><span class="mono-icon mono-icon-target" aria-hidden="true"></span> 여론 AI 시뮬레이션</h3>
+                </div>
+                <div class="custom-sim-form">
+                    <div class="document-intake-panel simple-intake" id="document-intake-panel">
+                        <section class="issue-briefing-panel ranking-panel top-ranking-panel" aria-label="이슈 순위">
+                            <div class="issue-briefing-header compact ranking-topbar">
+                                <h4>실시간 화제 Top 30</h4>
+                                <div class="ranking-topbar-actions">
+                                    <span id="article-feed-status" class="feed-sync-status is-waiting" aria-live="polite">방금</span>
+                                    <button class="ranking-expand-btn" data-ranking-expand type="button" onclick="toggleRankingPanel(event)" aria-expanded="false" aria-controls="ranking-expanded-panel">모두 보기</button>
+                                </div>
+                            </div>
+                            <div id="live-article-list" class="article-list ranking-list"></div>
+                        </section>
+                        <div class="document-intake-box prompt-like-box">
+                            <textarea id="document-intake-text" class="document-intake-text" rows="4" aria-label="기사, 질문, 정책 메모 입력" placeholder="기사 URL이나 본문을 붙여넣거나, 바로 묻고 싶은 질문을 입력하세요." oninput="handleDocumentIntakeInput()"></textarea>
+                            <div class="document-intake-actions prompt-actions">
+                                <div class="document-intake-feedback" id="document-intake-feedback"></div>
+                                <button class="sim-settings-btn" type="button" onclick="toggleSimulationSettings(event)" aria-expanded="false" aria-controls="sampling-options-panel"><span aria-hidden="true">⚙</span> 고급 설정</button>
+                                <button class="custom-sim-btn" onclick="runCustomSimulation()">▶ 시뮬레이션 실행</button>
+                            </div>
+                        </div>
+                        <div id="sampling-options-panel" class="sampling-options-popout" hidden>
+                            <div class="sampling-options-head"><strong>표본 옵션</strong><span>상세 설정</span></div>
+                        <div class="custom-sim-controls sampling-control-panel">
+                            <section class="sampling-option-section sampling-execution-section" aria-label="표본 수와 추정 방식">
+                                <div class="sampling-section-title"><strong>실행 표본</strong><span>표본 수와 추정 방식</span></div>
+                                <div class="sampling-mode-card">
+                                    <span>추정 방식</span>
+                                    <div class="custom-sim-tabs" role="tablist" aria-label="분석 방식">
+                                        <button id="sim-mode-panel" class="custom-sim-tab active" type="button" onclick="selectCustomSimMode('panel')">패널 표본추출 <small>추천</small></button>
+                                        <button id="sim-mode-nemotron" class="custom-sim-tab" type="button" onclick="selectCustomSimMode('nemotron')">NVIDIA 가상 표본추출</button>
+                                    </div>
+                                </div>
+                                <div class="sample-size-control sample-range-control">
+                                    <div class="sample-size-header">
+                                        <span>표본 수</span>
+                                        <strong id="custom-fixed-sample-label">2,000명</strong>
+                                    </div>
+                                    <input id="custom-sample-size-range" type="range" min="500" max="5000" step="100" value="2000" aria-label="표본 수 선택" oninput="selectFixedSampleSize(this.value)">
+                                    <div class="sample-size-ticks sample-size-ticks-wide"><span>500</span><span>1,000</span><span>2,000</span><span>3,000</span><span>4,000</span><span>5,000</span></div>
+                                    <p class="sampling-helper">선택한 표본 수를 기준으로 실제 실행 표본을 추출합니다.</p>
+                                </div>
+                            </section>
+                            <div class="sampling-frame-card sampling-frame-card-wide">
+                                <div class="sample-size-header">
+                                    <span>표본 프레임</span>
+                                    <strong id="custom-frame-source-label">2026.5. 기준</strong>
+                                </div>
+                                <div class="sampling-chip-group">
+                                    <div class="sampling-chip-label">성별 <small>전체 또는 다중선택</small></div>
+                                    <div id="custom-gender-filter" class="sampling-chips" data-dimension="gender"></div>
+                                </div>
+                                <div class="sampling-chip-group">
+                                    <div class="sampling-chip-label">지역별 <small>전체 또는 다중선택</small></div>
+                                    <div id="custom-region-filter" class="sampling-chips" data-dimension="region"></div>
+                                </div>
+                                <div class="sampling-chip-group">
+                                    <div class="sampling-chip-label">연령별 <small>전체 또는 다중선택</small></div>
+                                    <div id="custom-age-filter" class="sampling-chips" data-dimension="age"></div>
+                                </div>
+                            </div>
+                            <section class="sampling-option-section sampling-precision-section" aria-label="목표 신뢰수준과 목표 오차범위">
+                                <div class="sampling-section-title"><strong>정밀도 목표</strong><span>목표 신뢰수준과 목표 오차범위</span></div>
+                                <div class="sampling-frame-card sampling-confidence-card">
+                                    <div class="sample-size-header">
+                                        <span>목표 신뢰수준</span>
+                                        <strong id="custom-confidence-label">95%</strong>
+                                    </div>
+                                    <input id="custom-confidence-range" type="range" min="95" max="99" step="1" value="95" oninput="updateSamplingDesignLabels()">
+                                    <div class="sample-size-ticks"><span>95</span><span>96</span><span>97</span><span>98</span><span>99</span></div>
+                                    <div class="sampling-sub-control">
+                                        <div class="sample-size-header">
+                                            <span>목표 오차범위</span>
+                                            <strong id="custom-target-margin-label">±3.0%p</strong>
+                                        </div>
+                                        <input id="custom-margin-range" type="range" min="2" max="7" step="0.5" value="3" oninput="updateSamplingDesignLabels()">
+                                        <div class="sample-size-ticks"><span>±2</span><span>±3</span><span>±5</span><span>±7</span></div>
+                                    </div>
+                                </div>
+                            </section>
+                            <div class="sampling-frame-card sampling-audit-preview">
+                                <div class="sample-size-header">
+                                    <span>자동 계산 결과</span>
+                                    <strong id="custom-sample-size-label">계산 중</strong>
+                                </div>
+                                <div class="sampling-metric-list">
+                                    <div><span>선택 모집단</span><strong id="custom-population-label">—</strong></div>
+                                    <div><span>추천 표본 크기</span><strong id="custom-recommended-n-label">—</strong></div>
+                                    <div><span>사후 오차범위</span><strong id="custom-margin-label">—</strong></div>
+                                    <div><span>표본추출 방식</span><strong>프레임 할당 + 림가중</strong></div>
+                                </div>
+                                <p id="custom-sampling-summary" class="sampling-summary">표본 프레임을 불러오는 중입니다.</p>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="document-intake-insights" id="document-intake-insights" hidden></div>
+                    </div>
+                </div>
+                <div id="survey-design-container" class="survey-design-container" style="display:none">
+                    <div class="survey-design-header">
+                        <h4>📋 AI 설문 문항 및 응답지 설계</h4>
+                        <p>입력 이슈를 다각도로 분석하기 위해 AI가 최적의 문항과 응답 척도 세트를 설계했습니다. 시뮬레이션할 문항들을 선택하세요.</p>
+                    </div>
+                    <div id="survey-design-grid" class="survey-design-grid"></div>
+                    <div class="survey-design-actions">
+                        <span id="survey-design-count" class="survey-design-count"><strong>0</strong>개 선택됨</span>
+                        <button class="custom-sim-btn" onclick="runSequentialSimulationsFromDesign()">▶ 선택한 문항 시뮬레이션 실행</button>
+                    </div>
+                </div>
+                <div id="custom-sim-loading" class="custom-sim-loading" aria-live="polite"></div>
+                <div id="custom-sim-error" class="custom-sim-error" aria-live="polite"></div>
+                <div id="custom-sim-result" class="custom-sim-result" style="display:none">
+                    <div class="custom-result-header">
+                        <span id="custom-result-title">—</span>
+                        <span id="custom-result-source" class="source-badge">패널 가중추정</span>
+                    </div>
+                    <div class="scale-result-stats" id="custom-result-stats"></div>
+                    <div id="custom-sampling-audit" class="custom-sampling-audit"></div>
+                    <div id="custom-decision-memo" class="decision-memo"></div>
+                    <div id="custom-next-actions" class="custom-next-actions"></div>
+                    <div class="result-tabs" role="tablist" aria-label="결과 상세 보기">
+                        <button class="result-tab active" type="button" data-result-tab="segment" onclick="switchCustomResultTab('segment')">세그먼트</button>
+                        <button class="result-tab" type="button" data-result-tab="insight" onclick="switchCustomResultTab('insight')">총평</button>
+                        <button class="result-tab" type="button" data-result-tab="responses" onclick="switchCustomResultTab('responses')">응답</button>
+                        <button class="result-tab" type="button" data-result-tab="jury" onclick="switchCustomResultTab('jury')">배심단</button>
+                    </div>
+                    <div class="result-tab-panel active" id="result-tab-segment">
+                        <div class="chart-container detail-dot-container" style="margin-top:14px">
+                            <div class="chart-title">정치성향별 반응</div>
+                            <div id="custom-political-chart" class="bar-chart"></div>
+                        </div>
+                        <div class="chart-container detail-dot-container">
+                            <div class="chart-title">연령대별 반응</div>
+                            <div id="custom-age-chart" class="bar-chart"></div>
+                        </div>
+                        <div class="chart-container detail-dot-container">
+                            <div id="custom-region-chart-title" class="chart-title">지역별 반응</div>
+                            <div id="custom-region-chart" class="bar-chart"></div>
+                        </div>
+                    </div>
+                    <div class="result-tab-panel" id="result-tab-insight">
+                        <div class="custom-insights" id="custom-insights"></div>
+                    </div>
+                    <div class="result-tab-panel" id="result-tab-responses">
+                        <div class="custom-response-pool-section" id="custom-response-pool-section"></div>
+                    </div>
+                    <div class="result-tab-panel" id="result-tab-jury">
+                        <div class="custom-jury-section" id="custom-jury-section"></div>
+                    </div>
+                </div>
+            </div>
+            </section>
+
+            <section class="public-agenda-page parliament-page" id="parliament-page" aria-labelledby="parliament-title">
+                <div class="public-agenda-head">
+                    <div class="public-agenda-title-row">
+                        <span class="public-page-icon public-icon-assembly" aria-hidden="true">
+                            <svg viewBox="0 0 160 128" focusable="false">
+                                <path d="M80 8c28.9 0 52.5 17.3 58.7 42H21.3C27.5 25.3 51.1 8 80 8Zm-31.6 34h63.2C105.5 30.1 94.1 22 80 22s-25.5 8.1-31.6 20Z"/>
+                                <path d="M0 47h160v8H0zM8 104h144v8H8zM2 117h156v8H2z"/>
+                                <path d="M18 62h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Z"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <span>ASSEMBLY LIVE</span>
+                            <h2 id="parliament-title">실시간 의회</h2>
+                        </div>
+                    </div>
+                    <div class="public-agenda-head-controls">
+                        <div class="public-agenda-meta" id="parliament-feed-status">계류 의안 동기화 대기</div>
+                        <div class="public-agenda-view-switch" role="group" aria-label="의회 보기 모드">
+                            <button class="active" type="button" data-public-agenda-kind="parliament" data-public-view="grid-3-2" aria-label="3대2 카드 보기" title="3:2" aria-pressed="true" onclick="setPublicAgendaView('parliament','grid-3-2')"><span class="public-view-icon public-view-icon-3-2" aria-hidden="true"></span></button>
+                            <button type="button" data-public-agenda-kind="parliament" data-public-view="grid-2-3" aria-label="2대3 카드 보기" title="2:3" aria-pressed="false" onclick="setPublicAgendaView('parliament','grid-2-3')"><span class="public-view-icon public-view-icon-2-3" aria-hidden="true"></span></button>
+                            <button type="button" data-public-agenda-kind="parliament" data-public-view="list" aria-label="리스트 보기" title="리스트" aria-pressed="false" onclick="setPublicAgendaView('parliament','list')"><span class="public-view-icon public-view-icon-list" aria-hidden="true"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="public-agenda-toolbar">
+                    <strong id="parliament-feed-count">0건</strong>
+                    <button class="public-agenda-refresh" type="button" onclick="refreshPublicAgendaFeed('parliament')"><span class="mono-icon mono-icon-refresh" aria-hidden="true"></span>새로고침</button>
+                </div>
+                <div class="public-agenda-list" id="parliament-feed-list" aria-live="polite"></div>
+            </section>
+
+            <section class="public-agenda-page government-page" id="government-page" aria-labelledby="government-title">
+                <div class="public-agenda-head">
+                    <div class="public-agenda-title-row">
+                        <span class="public-page-icon public-icon-government" aria-hidden="true">
+                            <svg viewBox="0 0 256 256" focusable="false">
+                                <path d="M128 8c66.3 0 120 53.7 120 120 0 50.4-31.1 93.5-75.1 111.2 36.3-27.1 55.9-74.3 43.5-122.5C199.2 49.9 139.7 21.5 87 47.2c-33.3 16.2-50.2 50-42 82.6 5.3 21 21.3 34.7 41.2 35.2 18 .4 30.1-8.1 40.6-25.5 11.6-19.2 32.9-25.5 53.2-14.8 20.9 11 29.2 35.8 20.3 59.6-13.8 36.7-52.7 58.7-96.6 51C48.8 225.8 8 180.5 8 128 8 61.7 61.7 8 128 8Z"/>
+                                <path d="M104.8 47.4C160.3 19.7 222.2 53 237.7 116.6c5.7 23.4 4.2 45.5-3.2 64.9 21.4-63.1-13-125.8-75.4-138.1-19-3.7-37.3-2.1-54.3 4Z"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <span>GOVERNMENT LIVE</span>
+                            <h2 id="government-title">실시간 정부</h2>
+                        </div>
+                    </div>
+                    <div class="public-agenda-head-controls">
+                        <div class="public-agenda-meta" id="government-feed-status">정책브리핑 동기화 대기</div>
+                        <div class="public-agenda-view-switch" role="group" aria-label="정부 보기 모드">
+                            <button class="active" type="button" data-public-agenda-kind="government" data-public-view="grid-3-2" aria-label="3대2 카드 보기" title="3:2" aria-pressed="true" onclick="setPublicAgendaView('government','grid-3-2')"><span class="public-view-icon public-view-icon-3-2" aria-hidden="true"></span></button>
+                            <button type="button" data-public-agenda-kind="government" data-public-view="grid-2-3" aria-label="2대3 카드 보기" title="2:3" aria-pressed="false" onclick="setPublicAgendaView('government','grid-2-3')"><span class="public-view-icon public-view-icon-2-3" aria-hidden="true"></span></button>
+                            <button type="button" data-public-agenda-kind="government" data-public-view="list" aria-label="리스트 보기" title="리스트" aria-pressed="false" onclick="setPublicAgendaView('government','list')"><span class="public-view-icon public-view-icon-list" aria-hidden="true"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="public-agenda-toolbar">
+                    <strong id="government-feed-count">0건</strong>
+                    <button class="public-agenda-refresh" type="button" onclick="refreshPublicAgendaFeed('government')"><span class="mono-icon mono-icon-refresh" aria-hidden="true"></span>새로고침</button>
+                </div>
+                <div class="public-agenda-list" id="government-feed-list" aria-live="polite"></div>
+            </section>
+        </div>
+
+    </div>
+
+    <nav class="bottom-tab-bar" role="tablist" aria-label="주요 화면">
+        <button class="bottom-tab" type="button" data-audience-mode="forecast" role="tab" aria-label="예측" title="예측" aria-selected="false" aria-current="false" onclick="selectAudienceMode('forecast')">
+            <span class="mono-icon mono-icon-chart" aria-hidden="true"></span>
+        </button>
+        <button class="bottom-tab" type="button" data-audience-mode="sim" role="tab" aria-label="시뮬레이션" title="시뮬레이션" aria-selected="false" aria-current="false" onclick="selectAudienceMode('sim')">
+            <span class="audience-ds-logo" aria-hidden="true"><img class="audience-ds-icon audience-ds-icon-light" src="logo-icon.png" data-demo-src="logo-icon.png" alt=""><img class="audience-ds-icon audience-ds-icon-dark" src="logo-icon-dark.png" data-demo-src="logo-icon-dark.png" alt=""></span>
+        </button>
+        <button class="bottom-tab bottom-tab-home active has-new" type="button" data-audience-mode="home" role="tab" aria-label="홈" aria-selected="true" aria-current="page" onclick="selectAudienceMode('home')">
+            <span class="mono-icon mono-icon-home" aria-hidden="true"></span>
+        </button>
+        <button class="bottom-tab" type="button" data-audience-mode="parliament" role="tab" aria-label="의회" title="의회" aria-selected="false" aria-current="false" onclick="selectAudienceMode('parliament')">
+            <span class="public-tab-icon" aria-hidden="true">
+                <svg viewBox="0 0 160 128" focusable="false">
+                    <path d="M80 8c28.9 0 52.5 17.3 58.7 42H21.3C27.5 25.3 51.1 8 80 8Zm-31.6 34h63.2C105.5 30.1 94.1 22 80 22s-25.5 8.1-31.6 20Z"/>
+                    <path d="M0 47h160v8H0zM8 104h144v8H8zM2 117h156v8H2z"/>
+                    <path d="M18 62h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Z"/>
+                </svg>
+            </span>
+        </button>
+        <button class="bottom-tab" type="button" data-audience-mode="government" role="tab" aria-label="정부" title="정부" aria-selected="false" aria-current="false" onclick="selectAudienceMode('government')">
+            <span class="public-tab-icon" aria-hidden="true">
+                <svg viewBox="0 0 256 256" focusable="false">
+                    <path d="M128 8c66.3 0 120 53.7 120 120 0 50.4-31.1 93.5-75.1 111.2 36.3-27.1 55.9-74.3 43.5-122.5C199.2 49.9 139.7 21.5 87 47.2c-33.3 16.2-50.2 50-42 82.6 5.3 21 21.3 34.7 41.2 35.2 18 .4 30.1-8.1 40.6-25.5 11.6-19.2 32.9-25.5 53.2-14.8 20.9 11 29.2 35.8 20.3 59.6-13.8 36.7-52.7 58.7-96.6 51C48.8 225.8 8 180.5 8 128 8 61.7 61.7 8 128 8Z"/>
+                    <path d="M104.8 47.4C160.3 19.7 222.2 53 237.7 116.6c5.7 23.4 4.2 45.5-3.2 64.9 21.4-63.1-13-125.8-75.4-138.1-19-3.7-37.3-2.1-54.3 4Z"/>
+                </svg>
+            </span>
+        </button>
+    </nav>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-body">
+                <div class="poll-briefing-card" id="poll-briefing-card">
+                </div>
+                <div class="detail-analysis-tabs" role="tablist" aria-label="상세 분석">
+                    <div class="analysis-tab active" role="tab" onclick="switchAnalysis('segment')">세그먼트 분석</div>
+                    <div class="analysis-tab" role="tab" onclick="switchAnalysis('map')">포지셔닝맵</div>
+                    <div class="analysis-tab" role="tab" onclick="switchAnalysis('risk')">리스크분석</div>
+                    <div class="analysis-tab" role="tab" onclick="switchAnalysis('jury')">12인 숙의 배심원단</div>
+                    <div class="analysis-tab" role="tab" onclick="switchAnalysis('regression')">회귀분석</div>
+                </div>
+                <div id="segment-analysis" class="analysis-content active">
+                    <div id="segment-charts" class="segment-charts"></div>
+                </div>
+                <div id="map-analysis" class="analysis-content">
+                    <p id="map-description" class="map-description">성향과 연령을 두 축으로 배치합니다. 성별 축도 선택할 수 있습니다.</p>
+                    <p class="map-trust-note" aria-label="포지셔닝맵 방법 한계">성별 축 포함 모든 좌표는 표본 구조 기반 추정·보정 보기이며 현재 여론 수치로 사용하지 않습니다.</p>
+                    <div id="positioning-map" class="positioning-map"></div>
+                </div>
+                <div id="risk-analysis" class="analysis-content"><div id="risk-content"></div></div>
+                <div id="jury-analysis" class="analysis-content"><div id="jury-grid" class="jury-grid"></div></div>
+                <div id="regression-analysis" class="analysis-content"><div id="factor-list" class="factor-list"></div><p id="target-segment" class="target-segment"></p><div id="regression-diagnostics" class="regression-diagnostics-wrap"></div></div>
+                <div class="pie-chart-section">
+                    <div class="pie-chart-wrapper">
+                        <canvas id="opinion-pie" width="200" height="200"></canvas>
+                    </div>
+                    <div class="pie-legend">
+                        <div class="pie-legend-item"><span class="pie-dot" style="background:var(--opinion-agree)"></span><span class="pie-label">순동의 (동의 - 비동의)</span><span id="stat-net" class="pie-value" style="color:var(--opinion-agree)">-10.3%p</span></div>
+                        <div class="pie-legend-item"><span class="pie-dot" style="background:var(--opinion-agree)"></span><span class="pie-label">동의</span><span id="stat-agree" class="pie-value" style="color:var(--opinion-agree)">38.0%</span></div>
+                        <div class="pie-legend-item"><span class="pie-dot" style="background:var(--opinion-disagree)"></span><span class="pie-label">비동의</span><span id="stat-disagree" class="pie-value" style="color:var(--opinion-disagree)">48.3%</span></div>
+                        <div class="pie-legend-item"><span class="pie-dot" style="background:var(--accent-gray)"></span><span class="pie-label">판단 유보</span><span id="stat-unsure" class="pie-value" style="color:var(--text-secondary)">13.7%</span></div>
+                    </div>
+                </div>
+
+                <div class="modal-support-sections engagement-tabs" aria-label="댓글과 관련 기사">
+                <section id="comments-analysis" class="modal-support-section">
+                    <div id="modal-comments-content"></div>
+                </section>
+                <section id="articles-analysis" class="modal-support-section">
+                    <div id="related-articles-content"></div>
+                </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <strong>Deep Survey — 정책 반응 인텔리전스</strong>
+        <p class="footer-trust-caveat">Deep Survey의 수치와 분석은 AI 추정 기반 참고 정보이며 실제 여론조사 결과가 아닙니다. 법률·정책 판단은 관련 법령과 전문가 검토를 거쳐야 합니다.</p>
+        <nav class="footer-trust-nav" aria-label="Deep Survey 신뢰와 운영 안내">
+            <a href="#methodology" onclick="openModal('samsung_strike'); switchAnalysis('map'); return false;">방법론</a>
+            <a href="#privacy" onclick="openMyPage(); return false;">개인정보</a>
+            <a href="#operator-principles" onclick="openMyPage('settings'); return false;">운영 원칙</a>
+        </nav>
+    </footer>
+
+    <script>
+        ['app.js?v=20260520bc', 'issues_extra.js?v=20260515e', 'common-ui.js?v=20260520t', 'beta-intake.js?v=20260519b']
+            .forEach(src => document.write(`<script src="${window.DEEP_SURVEY_ASSET_BASE}${src}"><\/script>`));
+    </script>
+</body>
+
+</html>
