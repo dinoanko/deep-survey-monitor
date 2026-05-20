@@ -3923,6 +3923,8 @@ async function runCustomSimulation() {
 
         if (!designRes.ok) {
             console.warn('Design endpoint unavailable, running simulation directly');
+            renderSurveyDesignFallbackNotice('endpoint');
+            if (designContainer) designContainer.style.display = '';
             if (actionBtn) {
                 actionBtn.disabled = false;
                 actionBtn.textContent = originalBtnText || '▶ 시뮬레이션 실행';
@@ -3935,6 +3937,8 @@ async function runCustomSimulation() {
         const questions = designData.questions || [];
 
         if (!questions.length) {
+            renderSurveyDesignFallbackNotice('empty');
+            if (designContainer) designContainer.style.display = '';
             if (actionBtn) {
                 actionBtn.disabled = false;
                 actionBtn.textContent = originalBtnText || '▶ 시뮬레이션 실행';
@@ -3957,6 +3961,8 @@ async function runCustomSimulation() {
 
     } catch (err) {
         console.warn('Design phase error, falling back to direct simulation:', err);
+        renderSurveyDesignFallbackNotice('error');
+        if (designContainer) designContainer.style.display = '';
         if (actionBtn) {
             actionBtn.disabled = false;
             actionBtn.textContent = originalBtnText || '▶ 시뮬레이션 실행';
@@ -3965,10 +3971,35 @@ async function runCustomSimulation() {
     }
 }
 
+function renderSurveyDesignFallbackNotice(reason = 'error') {
+    const notice = document.getElementById('survey-design-fallback');
+    const grid = document.getElementById('survey-design-grid');
+    const countEl = document.getElementById('survey-design-count');
+    if (!notice) return;
+    const reasonLabel = reason === 'empty' ? '추천 문항 없음' : reason === 'endpoint' ? '설계 API 응답 없음' : '설계 오류';
+    notice.hidden = false;
+    notice.innerHTML = `
+        <span class="survey-design-fallback-kicker">${reasonLabel}</span>
+        <strong>문항 설계 건너뜀</strong>
+        <span>입력 보존 · 기본 시뮬레이션으로 진행</span>
+    `;
+    notice.setAttribute('aria-label', `${reasonLabel}: 문항 설계 건너뜀, 입력 보존, 기본 시뮬레이션으로 진행`);
+    if (grid) grid.innerHTML = '';
+    if (countEl) {
+        countEl.innerHTML = '<strong>1</strong>개 기본 문항 실행 중';
+        countEl.setAttribute('aria-label', '1개 기본 문항 실행 중');
+    }
+}
+
 let _selectedDesignQuestionIndices = new Set();
 
 function renderSurveyDesignCards(questions) {
     const grid = document.getElementById('survey-design-grid');
+    const fallback = document.getElementById('survey-design-fallback');
+    if (fallback) {
+        fallback.hidden = true;
+        fallback.innerHTML = '';
+    }
     if (!grid) return;
     _selectedDesignQuestionIndices = new Set(questions.map((_, i) => i));
 
@@ -4245,8 +4276,13 @@ function renderSimulationResults(results) {
     renderCustomSimResult(first.direction.title, first.result);
     const container = document.getElementById('custom-jury-section');
     if (!container) return;
-    const extraHtml = rest.map(({ direction, result }) => renderCompactSimulationResult(direction, result)).join('');
-    container.insertAdjacentHTML('beforebegin', `<div class="multi-result-section"><h5>추가 선택 방향 결과</h5>${extraHtml}</div>`);
+    const extraHtml = rest.map(({ direction, result }, index) => renderCompactSimulationResult(direction, result, index + 2)).join('');
+    const summaryHtml = `<div class="multi-result-summary" data-multi-result-summary>
+        <span class="multi-result-summary-chip strong">상세 1개</span>
+        <span class="multi-result-summary-chip">비교 ${rest.length}개</span>
+        <span class="multi-result-summary-chip">총 ${results.length}개 문항</span>
+    </div>`;
+    container.insertAdjacentHTML('beforebegin', `<section class="multi-result-section" aria-label="선택 문항별 시뮬레이션 결과 비교"><h5>선택 문항 비교</h5>${summaryHtml}${extraHtml}</section>`);
 }
 
 function clearSimulationFailure() {
@@ -4284,12 +4320,13 @@ function renderSimulationFailure(error, directions = [], issue = null, sampleSiz
     errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function renderCompactSimulationResult(direction, data) {
+function renderCompactSimulationResult(direction, data, sequenceNumber = null) {
     const estimate = data?.score_estimate || {};
     const ci = estimate.confidence_interval?.mean_agreement_pct || [0, 0];
-    return `<div class="multi-result-card">
+    const sequenceLabel = sequenceNumber ? `${sequenceNumber}번 문항` : '비교 문항';
+    return `<div class="multi-result-card" data-multi-result-card>
         <div>
-            <span>${escapeHtml(direction.lane)}</span>
+            <span>${escapeHtml(sequenceLabel)}</span>
             <strong>${escapeHtml(direction.title)}</strong>
             <em class="ai-estimate-inline">AI 추정</em>
         </div>

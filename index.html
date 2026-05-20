@@ -39,7 +39,7 @@
             ) return '';
             return '';
         })();
-        document.write(`<link rel="stylesheet" href="${window.DEEP_SURVEY_ASSET_BASE}styles.css?v=20260520bb">`);
+        document.write(`<link rel="stylesheet" href="${window.DEEP_SURVEY_ASSET_BASE}styles.css?v=20260521c">`);
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('[data-demo-src]').forEach(el => {
                 el.setAttribute('src', `${window.DEEP_SURVEY_ASSET_BASE}${el.dataset.demoSrc}`);
@@ -543,8 +543,13 @@
                 <div id="survey-design-container" class="survey-design-container" style="display:none">
                     <div class="survey-design-header">
                         <h4>📋 AI 설문 문항 및 응답지 설계</h4>
-                        <p>입력 이슈를 다각도로 분석하기 위해 AI가 최적의 문항과 응답 척도 세트를 설계했습니다. 시뮬레이션할 문항들을 선택하세요.</p>
+                        <div class="survey-design-step-rail" role="list" aria-label="설문 설계 진행 단계">
+                            <span class="survey-design-step" role="listitem"><b>1</b>문항 확인</span>
+                            <span class="survey-design-step" role="listitem"><b>2</b>선택</span>
+                            <span class="survey-design-step" role="listitem"><b>3</b>실행</span>
+                        </div>
                     </div>
+                    <div id="survey-design-fallback" class="survey-design-fallback" role="status" aria-live="polite" aria-atomic="true" data-survey-design-fallback hidden></div>
                     <div id="survey-design-grid" class="survey-design-grid"></div>
                     <div class="survey-design-actions">
                         <span id="survey-design-count" class="survey-design-count" role="status" aria-live="polite" aria-atomic="true" aria-label="0개 문항 선택됨" data-survey-design-status><strong>0</strong>개 선택됨</span>
@@ -749,7 +754,7 @@
     </footer>
 
     <script>
-        ['app.js?v=20260520bd', 'issues_extra.js?v=20260515e', 'common-ui.js?v=20260520t', 'beta-intake.js?v=20260519b']
+        ['app.js?v=20260521c', 'issues_extra.js?v=20260515e', 'common-ui.js?v=20260520t', 'beta-intake.js?v=20260519b']
             .forEach(src => document.write(`<script src="${window.DEEP_SURVEY_ASSET_BASE}${src}"><\/script>`));
     </script>
 </body>

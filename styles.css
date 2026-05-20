@@ -928,11 +928,14 @@ body.audience-b2c .issue-more-menu button{border-radius:6px}
 .sampling-progress-timeline em{display:block;margin-top:2px;font-style:normal;font-size:10px;line-height:1.35;color:var(--text-secondary);word-break:break-word}
 .multi-result-section{margin-top:12px}
 .multi-result-section h5{font-size:13px;margin-bottom:8px}
-.multi-result-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-.multi-result-card div:first-child{display:flex;flex-direction:column;gap:4px}
+.multi-result-summary{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;min-width:0}
+.multi-result-summary-chip{display:inline-flex;align-items:center;min-height:36px;padding:0 10px;border:1px solid var(--border-color);border-radius:999px;background:rgba(21,151,212,.08);font-size:11px;font-weight:700;color:var(--text-secondary);white-space:nowrap}
+.multi-result-summary-chip.strong{color:var(--text-primary);background:rgba(21,151,212,.14)}
+.multi-result-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;min-width:0}
+.multi-result-card div:first-child{display:flex;flex-direction:column;gap:4px;min-width:0}
 .multi-result-card span{font-size:10px;color:var(--text-secondary)}
-.multi-result-card strong{font-size:13px;line-height:1.35}
-.multi-result-metrics{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.multi-result-card strong{font-size:13px;line-height:1.35;word-break:keep-all;overflow-wrap:anywhere}
+.multi-result-metrics{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;min-width:0;word-break:keep-all}
 @media(max-width:860px){.multi-result-card{flex-direction:column}.multi-result-metrics{justify-content:flex-start}}
 
 /* Footer */
@@ -2618,11 +2621,40 @@ html,body{overflow-x:hidden}
     gap: 8px;
 }
 
-.survey-design-header p {
-    margin: 0;
-    font-size: 12.5px;
+.survey-design-step-rail {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.survey-design-step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-primary);
     color: var(--text-secondary);
-    line-height: 1.45;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.survey-design-step b {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    background: rgba(21, 151, 212, 0.12);
+    color: #2197d4;
+    font-size: 11px;
 }
 
 .survey-design-grid {
@@ -2630,6 +2662,44 @@ html,body{overflow-x:hidden}
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     margin-bottom: 20px;
+}
+
+.survey-design-fallback {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 44px;
+    margin: 0 0 14px 0;
+    padding: 10px 12px;
+    border: 1px solid color-mix(in srgb, var(--opinion-agree) 28%, var(--border-color));
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--opinion-agree-soft) 54%, var(--bg-primary));
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.survey-design-fallback[hidden] {
+    display: none;
+}
+
+.survey-design-fallback strong {
+    color: var(--text-primary);
+    font-weight: 950;
+}
+
+.survey-design-fallback-kicker {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    white-space: nowrap;
 }
 
 @media (max-width: 768px) {
@@ -2787,6 +2857,22 @@ html,body{overflow-x:hidden}
 
     .survey-question-card {
         padding: 14px;
+    }
+
+    .survey-design-step-rail {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .survey-design-step {
+        justify-content: flex-start;
+    }
+
+    .survey-design-fallback {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 12px;
     }
 
     .survey-design-actions {
