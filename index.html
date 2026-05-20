@@ -27,7 +27,11 @@
     <script>
         window.DEEP_SURVEY_ASSET_BASE = (() => {
             const path = window.location.pathname.replace(/\\/g, '/');
-            if (window.location.protocol === 'file:' || path.includes('/demo/')) return '';
+            if (
+                window.location.protocol === 'file:' ||
+                path.includes('/demo/') ||
+                path.includes('/deep-survey-monitor/')
+            ) return '';
             return '/demo/';
         })();
         document.write(`<link rel="stylesheet" href="${window.DEEP_SURVEY_ASSET_BASE}styles.css?v=20260520bb">`);

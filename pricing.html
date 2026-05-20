@@ -120,6 +120,48 @@
             background: var(--brand-blue);
         }
 
+        .pricing-decision-panel {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin: 0 0 26px;
+        }
+
+        .decision-chip {
+            min-height: 72px;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(0, 82, 255, .14), var(--bg-secondary));
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+            padding: 14px 16px;
+            text-decoration: none;
+            min-width: 0;
+            transition: border-color .15s, transform .15s, background .15s;
+        }
+
+        .decision-chip:hover,
+        .decision-chip:focus-visible {
+            border-color: var(--brand-blue);
+            transform: translateY(-1px);
+            outline: none;
+            background: linear-gradient(135deg, rgba(0, 82, 255, .24), var(--bg-secondary));
+        }
+
+        .decision-chip strong {
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .decision-chip span {
+            color: var(--text-secondary);
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
         .section-title {
             display: flex;
             align-items: center;
@@ -361,6 +403,10 @@
                 grid-template-columns: 1fr;
             }
 
+            .pricing-decision-panel {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
             .plans-grid,
             .package-grid {
                 grid-template-columns: 1fr;
@@ -368,7 +414,8 @@
         }
 
         @media (max-width: 640px) {
-            .pricing-checkout-trust {
+            .pricing-checkout-trust,
+            .pricing-decision-panel {
                 grid-template-columns: 1fr;
                 padding: 10px;
             }
@@ -415,10 +462,17 @@
             <span><strong>세금계산서 · 언제든 취소</strong>팀 결제 증빙과 플랜 변경/취소 흐름을 설정에서 관리합니다.</span>
         </section>
 
+        <nav class="pricing-decision-panel" aria-label="요금제 빠른 선택">
+            <a class="decision-chip" href="#plan-free"><strong>월 3건 이하</strong><span>Free로 시작하고 필요할 때 건별 이용</span></a>
+            <a class="decision-chip" href="#plan-pro"><strong>정기 리서치</strong><span>Pro · Survey Design/PoI 포함</span></a>
+            <a class="decision-chip" href="#plan-max"><strong>대규모/팀</strong><span>Max · 표본 2,000명/우선 지원</span></a>
+            <a class="decision-chip" href="#package-team"><strong>선불 패키지</strong><span>Team 30건 묶음으로 먼저 확보</span></a>
+        </nav>
+
         <section>
             <h2 class="section-title">구독 플랜 <span>개인 및 소규모 팀</span></h2>
             <div class="plans-grid">
-                <article class="plan-card">
+                <article class="plan-card" id="plan-free">
                     <div class="plan-name">Free</div>
                     <p class="plan-desc">소규모 정책 검토를 위한 스타터 플랜</p>
                     <div class="plan-price"><strong>₩0</strong><span>/월</span></div>
@@ -431,7 +485,7 @@
                     <button class="plan-cta secondary">현재 플랜</button>
                 </article>
 
-                <article class="plan-card featured">
+                <article class="plan-card featured" id="plan-pro">
                     <span class="plan-badge">추천</span>
                     <div class="plan-name">Pro</div>
                     <p class="plan-desc">정기적으로 이슈를 검토하는 리서치 실무자용</p>
@@ -446,7 +500,7 @@
                     <button class="plan-cta" aria-describedby="pricing-checkout-trust">Pro 시작하기</button>
                 </article>
 
-                <article class="plan-card">
+                <article class="plan-card" id="plan-max">
                     <div class="plan-name">Max</div>
                     <p class="plan-desc">심층 인터뷰와 대규모 표본까지 쓰는 팀용</p>
                     <div class="plan-price"><strong>₩79,000</strong><span>/월</span></div>
@@ -507,7 +561,7 @@
                     <p>이슈 리뷰와 가벼운 검증을 묶어 쓰는 개인용 패키지</p>
                     <div class="item-price"><strong>₩79,000</strong><span>10건</span></div>
                 </article>
-                <article class="package-card">
+                <article class="package-card" id="package-team">
                     <h3>Team</h3>
                     <p>여러 캠페인과 정책 안건을 함께 보는 팀용 패키지</p>
                     <div class="item-price"><strong>₩199,000</strong><span>30건</span></div>

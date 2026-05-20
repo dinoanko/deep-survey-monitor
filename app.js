@@ -3980,12 +3980,12 @@ function renderSurveyDesignCards(questions) {
     };
 
     grid.innerHTML = questions.map((q, i) => `
-        <div class="survey-question-card selected" data-design-idx="${i}" onclick="toggleDesignQuestion(${i})">
+        <div class="survey-question-card selected" data-design-idx="${i}" role="checkbox" tabindex="0" aria-checked="true" aria-label="${escapeHtml(q.policy_title)} 문항 선택" onclick="toggleDesignQuestion(${i})" onkeydown="handleDesignQuestionKeydown(event, ${i})">
             <div class="survey-question-card-top">
                 <span class="survey-question-badge ${escapeHtml(q.question_type)}">${escapeHtml(badgeLabels[q.question_type] || q.question_type)}</span>
-                <div class="survey-question-checkbox-wrapper">
-                    <input type="checkbox" class="survey-question-checkbox" checked data-design-check="${i}"
-                           onclick="event.stopPropagation(); toggleDesignQuestion(${i})" />
+                <div class="survey-question-checkbox-wrapper" aria-hidden="true">
+                    <input type="checkbox" class="survey-question-checkbox" checked data-design-check="${i}" tabindex="-1"
+                           onclick="event.stopPropagation(); toggleDesignQuestion(${i})" aria-label="${escapeHtml(q.policy_title)} 문항 선택" />
                 </div>
             </div>
             <p class="survey-question-title">${escapeHtml(q.policy_title)}</p>
@@ -4008,9 +4008,20 @@ function toggleDesignQuestion(idx) {
     }
     const card = document.querySelector(`.survey-question-card[data-design-idx="${idx}"]`);
     const checkbox = document.querySelector(`input[data-design-check="${idx}"]`);
-    if (card) card.classList.toggle('selected', _selectedDesignQuestionIndices.has(idx));
-    if (checkbox) checkbox.checked = _selectedDesignQuestionIndices.has(idx);
+    const isSelected = _selectedDesignQuestionIndices.has(idx);
+    if (card) {
+        card.classList.toggle('selected', isSelected);
+        card.setAttribute('aria-checked', String(isSelected));
+    }
+    if (checkbox) checkbox.checked = isSelected;
     updateDesignSelectionCount();
+}
+
+function handleDesignQuestionKeydown(event, idx) {
+    if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggleDesignQuestion(idx);
+    }
 }
 
 function updateDesignSelectionCount() {
