@@ -39,7 +39,7 @@
             ) return '';
             return '';
         })();
-        document.write(`<link rel="stylesheet" href="${window.DEEP_SURVEY_ASSET_BASE}styles.css?v=20260521c">`);
+        document.write(`<link rel="stylesheet" href="${window.DEEP_SURVEY_ASSET_BASE}styles.css?v=20260521d">`);
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('[data-demo-src]').forEach(el => {
                 el.setAttribute('src', `${window.DEEP_SURVEY_ASSET_BASE}${el.dataset.demoSrc}`);
@@ -754,7 +754,7 @@
     </footer>
 
     <script>
-        ['app.js?v=20260521c', 'issues_extra.js?v=20260515e', 'common-ui.js?v=20260520t', 'beta-intake.js?v=20260519b']
+        ['app.js?v=20260521d', 'issues_extra.js?v=20260515e', 'common-ui.js?v=20260520t', 'beta-intake.js?v=20260519b']
             .forEach(src => document.write(`<script src="${window.DEEP_SURVEY_ASSET_BASE}${src}"><\/script>`));
     </script>
 </body>

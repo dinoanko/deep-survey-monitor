@@ -2439,6 +2439,17 @@ function sanitizeLiveIssueFeedReferences(data) {
     };
 }
 
+async function fetchStaticLiveIssueSnapshot() {
+    const res = await fetch(`live-issues.json?_=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`static snapshot ${res.status}`);
+    const data = await res.json();
+    return {
+        ...data,
+        source: data?.source ? `${data.source}_static_snapshot` : 'naver_1mm_static_snapshot',
+        is_static_snapshot: true,
+    };
+}
+
 async function fetchLiveIssueFeed() {
     if (liveIssueFeedLoading) return;
     liveIssueFeedLoading = true;
@@ -2451,7 +2462,12 @@ async function fetchLiveIssueFeed() {
         const data = await res.json();
         renderLiveIssueFeed(data);
     } catch (err) {
-        renderLiveIssueFeed(buildFallbackLiveIssueFeed('local_fallback_api_unavailable'));
+        try {
+            const snapshot = await fetchStaticLiveIssueSnapshot();
+            renderLiveIssueFeed(snapshot);
+        } catch (snapshotErr) {
+            renderLiveIssueFeed(buildFallbackLiveIssueFeed('local_fallback_api_unavailable'));
+        }
     } finally {
         liveIssueFeedLoading = false;
     }
