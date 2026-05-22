@@ -438,7 +438,10 @@ function initModalSwipeDismiss() {
             'input',
             'textarea',
             'select',
+            'button',
+            'a',
             '[contenteditable="true"]',
+            '.modal-close-button',
             '.detail-analysis-tabs',
             '.analysis-tabs',
             '.result-tabs',
@@ -460,8 +463,11 @@ function initModalSwipeDismiss() {
 
     modal.addEventListener('pointerdown', event => {
         if (!modal.classList.contains('active') || event.pointerType === 'mouse') return;
-        const panel = event.target.closest?.('.modal-content');
-        if (!panel || shouldIgnoreSwipeStart(event.target)) return;
+        if (shouldIgnoreSwipeStart(event.target)) return;
+        const startedOnModalScreen = event.target === modal || Boolean(event.target.closest?.('.modal-content'));
+        if (!startedOnModalScreen) return;
+        const panel = getPanel();
+        if (!panel) return;
         startX = event.clientX;
         startY = event.clientY;
         lastX = event.clientX;
@@ -470,7 +476,7 @@ function initModalSwipeDismiss() {
         horizontalIntent = false;
         panel.classList.add('is-swipe-tracking');
         try {
-            panel.setPointerCapture?.(event.pointerId);
+            event.target.setPointerCapture?.(event.pointerId);
         } catch (_) {
             // Synthetic/browser-smoke pointer events may not be capturable; real touch pointers are.
         }
@@ -505,7 +511,7 @@ function initModalSwipeDismiss() {
         tracking = false;
         pointerId = null;
         try {
-            panel?.releasePointerCapture?.(event.pointerId);
+            event.target.releasePointerCapture?.(event.pointerId);
         } catch (_) {
             // Ignore non-captured synthetic pointers used by automated browser smoke checks.
         }

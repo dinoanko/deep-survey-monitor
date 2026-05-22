@@ -945,10 +945,9 @@ body.audience-b2c .issue-more-menu button{border-radius:6px}
 /* Modal */
 .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,11,13,.85);backdrop-filter:blur(10px);z-index:1000;overflow-y:auto;overflow-x:hidden;padding:20px 12px}
 .modal-overlay.active{display:flex;justify-content:center;align-items:flex-start;padding-bottom:calc(104px + env(safe-area-inset-bottom))}
-.modal-close-button{position:fixed;top:calc(12px + env(safe-area-inset-top));right:12px;z-index:1010;display:inline-grid;place-items:center;width:44px;height:44px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(8,12,20,.72);color:#fff;font-family:inherit;font-size:24px;font-weight:800;line-height:1;box-shadow:0 12px 32px rgba(0,0,0,.28);backdrop-filter:blur(12px);cursor:pointer}
-.modal-floating-back{position:fixed;right:12px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:1010;display:inline-flex;align-items:center;justify-content:center;min-width:92px;min-height:44px;padding:0 14px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(8,12,20,.78);color:#fff;font-family:inherit;font-size:13px;font-weight:900;line-height:1;box-shadow:0 14px 36px rgba(0,0,0,.32);backdrop-filter:blur(12px);cursor:pointer}
-.modal-close-button:hover,.modal-floating-back:hover{background:rgba(15,23,42,.92)}
-.modal-close-button:focus-visible,.modal-floating-back:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.modal-close-button{position:fixed;top:calc(12px + env(safe-area-inset-top));right:12px;z-index:1010;display:inline-grid;place-items:center;width:44px;height:44px;border:1px solid rgba(15,23,42,.14);border-radius:999px;background:#fff;color:#111827;font-family:inherit;font-size:24px;font-weight:800;line-height:1;box-shadow:0 12px 32px rgba(15,23,42,.16);cursor:pointer}
+.modal-close-button:hover{background:#f8fafc;border-color:rgba(15,23,42,.24)}
+.modal-close-button:focus-visible{outline:2px solid #111827;outline-offset:3px}
 .modal-content{background:var(--bg-primary);border-radius:16px;max-width:1000px;width:100%;border:1px solid var(--border-color);margin:20px 0;transform:translateX(var(--modal-swipe-x,0)) rotate(var(--modal-swipe-rotate,0deg));opacity:var(--modal-swipe-opacity,1)}
 .modal-header,.modal-context,.modal-context-badge{display:none}
 .modal-context-title,.modal-context-subtitle{display:none}
@@ -2328,11 +2327,11 @@ body.audience-government .government-page{display:flex}
 .public-agenda-list.public-agenda-view-grid-2-3 .public-agenda-card p{-webkit-line-clamp:5}
 .public-agenda-list:not(.public-agenda-view-list) .public-agenda-card p.public-agenda-summary-line,
 .public-agenda-card p.public-agenda-summary-line{display:block;white-space:nowrap;-webkit-line-clamp:unset;-webkit-box-orient:initial}
-.public-opinion-scale{--scale-agree:var(--opinion-agree);--scale-agree-strong:var(--opinion-agree-strong);--scale-oppose:var(--opinion-disagree);--scale-oppose-strong:var(--opinion-disagree-strong);--scale-neutral:var(--opinion-neutral);display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:4px 0}
+.public-opinion-scale{--scale-agree:var(--opinion-agree);--scale-agree-strong:var(--opinion-agree-strong);--scale-oppose:var(--opinion-disagree);--scale-oppose-strong:var(--opinion-disagree-strong);--scale-neutral:var(--opinion-neutral);display:grid;grid-template-columns:minmax(42px,.55fr) minmax(0,520px) minmax(42px,.55fr);align-items:center;column-gap:clamp(10px,2vw,24px);padding:4px 0;width:100%}
 .public-scale-label{font-size:12px;font-weight:850;line-height:1;white-space:nowrap}
-.public-scale-label.agree{color:var(--scale-agree)}
-.public-scale-label.oppose{color:var(--scale-oppose)}
-.public-opinion-dots{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0}
+.public-scale-label.agree{justify-self:start;color:var(--scale-agree)}
+.public-scale-label.oppose{justify-self:end;color:var(--scale-oppose);text-align:right}
+.public-opinion-dots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;justify-items:center;gap:clamp(6px,1.3vw,18px);width:100%;max-width:520px;min-width:0;justify-self:center}
 .public-scale-dot{position:relative;display:inline-grid;place-items:center;width:24px;height:24px;min-width:24px;min-height:24px;padding:0;border:2.2px solid currentColor;border-radius:50%;background:var(--bg-card);color:var(--scale-agree);cursor:pointer;flex:0 0 auto;transition:background .15s,border-color .15s,box-shadow .15s,color .15s,transform .15s}
 .public-scale-dot:hover{transform:translateY(-1px)}
 .public-scale-dot.agree{color:var(--scale-agree)}
@@ -2344,13 +2343,14 @@ body.audience-government .government-page{display:flex}
 .public-scale-dot.selected:not(.neutral)::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:14px;font-weight:950;line-height:1}
 .public-scale-dot.neutral.selected::after{content:'?';position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:950;line-height:1}
 .public-scale-dot:focus-visible{outline:3px solid var(--opinion-agree-glow);outline-offset:2px}
-.public-agenda-list.public-agenda-view-list .public-opinion-scale{gap:16px;padding:6px 0}
+.public-agenda-list.public-agenda-view-list .public-opinion-scale{grid-template-columns:minmax(62px,1fr) minmax(260px,760px) minmax(62px,1fr);column-gap:clamp(18px,3vw,44px);padding:8px clamp(8px,2vw,28px)}
 .public-opinion-scale.is-hidden,.public-agenda-card.has-public-vote .public-opinion-scale{display:none}
-.public-agenda-list.public-agenda-view-list .public-opinion-dots{justify-content:center;gap:14px}
+.public-agenda-list.public-agenda-view-list .public-opinion-dots{gap:clamp(14px,2.6vw,36px);max-width:760px}
 .public-agenda-list.public-agenda-view-list .public-scale-dot{width:30px;height:30px;min-width:30px;min-height:30px;border-width:2.5px}
 .public-agenda-list.public-agenda-view-list .public-scale-dot.agree-strong,
 .public-agenda-list.public-agenda-view-list .public-scale-dot.oppose-strong{width:36px;height:36px;min-width:36px;min-height:36px}
 .public-agenda-list.public-agenda-view-grid-2-3 .public-opinion-scale{grid-template-columns:1fr;justify-items:center;gap:8px}
+.public-agenda-list.public-agenda-view-grid-2-3 .public-opinion-dots{max-width:260px;gap:8px}
 .public-agenda-list.public-agenda-view-grid-2-3 .public-scale-label.agree{justify-self:start}
 .public-agenda-list.public-agenda-view-grid-2-3 .public-scale-label.oppose{justify-self:end}
 .public-poll-result{display:none;flex-direction:column;gap:8px}
@@ -2388,6 +2388,11 @@ body.audience-government .government-page{display:flex}
   .public-agenda-list.public-agenda-view-grid-3-2,
   .public-agenda-list.public-agenda-view-grid-2-3{grid-template-columns:1fr}
   .public-agenda-list:not(.public-agenda-view-list) .public-agenda-card{aspect-ratio:auto;min-height:0}
+  .public-agenda-list.public-agenda-view-list .public-opinion-scale{grid-template-columns:44px minmax(0,1fr) 44px;column-gap:8px;padding:6px 0}
+  .public-agenda-list.public-agenda-view-list .public-opinion-dots{gap:8px;max-width:100%}
+  .public-agenda-list.public-agenda-view-list .public-scale-dot{width:28px;height:28px;min-width:28px;min-height:28px}
+  .public-agenda-list.public-agenda-view-list .public-scale-dot.agree-strong,
+  .public-agenda-list.public-agenda-view-list .public-scale-dot.oppose-strong{width:34px;height:34px;min-width:34px;min-height:34px}
   .public-agenda-card-top{align-items:flex-start;gap:8px}
   .public-agenda-top-tags{flex:1 1 auto}
   .public-agenda-actions{justify-content:flex-start}

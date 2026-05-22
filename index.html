@@ -39,6 +39,7 @@
             ) return '';
             return '';
         })();
+        window.DEEP_SURVEY_API_BASE = 'https://govai-deep-survey.netlify.app/api/v1';
         document.write(`<link rel="stylesheet" href="${window.DEEP_SURVEY_ASSET_BASE}styles.css?v=20260522c">`);
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('[data-demo-src]').forEach(el => {
@@ -702,7 +703,6 @@
                 </div>
             </div>
         </div>
-        <button class="modal-floating-back" type="button" aria-label="뒤로가기" onclick="closeModal()">← 뒤로</button>
     </div>
 
     <footer class="footer">
