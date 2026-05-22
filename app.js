@@ -2105,7 +2105,8 @@ const API_BASES = (() => {
     if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
         return [origin + '/api/v1', ...localBases.filter(base => !base.startsWith(origin))];
     }
-    return [origin + '/api/v1'];
+    // Remote origins (e.g. GitHub Pages): try origin first, then fall back to local dev server
+    return [origin + '/api/v1', ...localBases];
 })();
 
 async function apiFetch(path, options = {}) {
@@ -2113,7 +2114,7 @@ async function apiFetch(path, options = {}) {
     for (const base of API_BASES) {
         try {
             const res = await fetch(`${base}${path}`, options);
-            if (res.ok || ![404, 502, 503, 504].includes(res.status)) return res;
+            if (res.ok || ![404, 405, 502, 503, 504].includes(res.status)) return res;
             lastError = new Error(`API ${res.status}`);
         } catch (err) {
             lastError = err;
