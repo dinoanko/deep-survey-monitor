@@ -464,6 +464,7 @@ html.audience-b2c{scroll-snap-type:y proximity}
 .account-pref-button.active strong{color:var(--bg-primary);opacity:.78}
 .account-segmented{display:grid;grid-template-columns:1fr 1fr;gap:5px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-secondary);padding:5px}
 .account-segmented-quad{grid-template-columns:repeat(4,minmax(0,1fr))}
+.account-segmented-trio{grid-template-columns:repeat(3,minmax(0,1fr))}
 .account-segmented button{border:0;border-radius:6px;background:transparent;color:var(--text-secondary);font-family:inherit;font-size:12px;font-weight:950;padding:10px;cursor:pointer}
 .account-segmented button.active{background:var(--text-primary);color:var(--bg-primary)}
 .account-data-table{border:1px solid var(--border-color);border-radius:8px;overflow:hidden}
@@ -489,7 +490,7 @@ html.account-compact-ui body.audience-b2c .issue-card-header{padding-top:48px}
 html.account-compact-ui body.audience-b2c .issue-card-body{padding-top:16px;padding-bottom:16px}
 html.account-compact-ui body.audience-b2c .quick-stats{font-size:15px}
 html.account-reduce-motion *,html.account-reduce-motion *::before,html.account-reduce-motion *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.001ms!important}
-@media(max-width:640px){.account-metrics,.account-pref-grid,.taste-axis-grid{grid-template-columns:1fr 1fr}.account-segmented-quad{grid-template-columns:repeat(2,minmax(0,1fr))}.account-check-row{grid-template-columns:24px minmax(0,1fr)}.account-check-row small{grid-column:2}.account-data-row{grid-template-columns:1fr 44px}.account-data-row small{grid-column:1/-1;text-align:left}.account-tabs button{font-size:11px;padding-inline:3px}.taste-evidence-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.account-metrics,.account-pref-grid,.taste-axis-grid{grid-template-columns:1fr 1fr}.account-segmented-quad{grid-template-columns:repeat(2,minmax(0,1fr))}.account-segmented-trio{grid-template-columns:1fr}.account-check-row{grid-template-columns:24px minmax(0,1fr)}.account-check-row small{grid-column:2}.account-data-row{grid-template-columns:1fr 44px}.account-data-row small{grid-column:1/-1;text-align:left}.account-tabs button{font-size:11px;padding-inline:3px}.taste-evidence-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:430px){.account-metrics,.account-pref-grid,.taste-axis-grid,.taste-evidence-grid{grid-template-columns:1fr}.account-tabs{grid-template-columns:repeat(2,1fr)}.account-activity-item{grid-template-columns:60px minmax(0,1fr)}.account-activity-item small{grid-column:2;text-align:left}}
 .comment-thread{display:flex;flex-direction:column;gap:12px}
 .comment-thread-title{font-size:14px;font-weight:900;line-height:1.35;color:var(--text-primary)}
@@ -2146,6 +2147,7 @@ body.audience-b2b .issue-reference-pagination button:disabled{opacity:.42;cursor
 body.audience-home,
 body.audience-forecast,
 body.audience-sim,
+body.audience-public,
 body.audience-parliament,
 body.audience-government,
 body.audience-b2c,
@@ -2153,6 +2155,7 @@ body.audience-b2b{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 body.audience-home .header-actions,
 body.audience-forecast .header-actions,
 body.audience-sim .header-actions,
+body.audience-public .header-actions,
 body.audience-parliament .header-actions,
 body.audience-government .header-actions,
 body.audience-b2c .header-actions,
@@ -2168,6 +2171,11 @@ body.audience-parliament .hot-section,
 body.audience-parliament .forecast-vote-section,
 body.audience-parliament .custom-sim-section,
 body.audience-parliament .issue-section,
+body.audience-public .trending-section,
+body.audience-public .hot-section,
+body.audience-public .forecast-vote-section,
+body.audience-public .custom-sim-section,
+body.audience-public .issue-section,
 body.audience-government .trending-section,
 body.audience-government .hot-section,
 body.audience-government .forecast-vote-section,
@@ -2179,7 +2187,7 @@ body.page-slide-right #survey-content{transform:translateX(22px);opacity:.72}
 .bottom-tab-bar{display:none}
 .bottom-tab-bar{
   position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom));z-index:1300;
-  width:min(420px,calc(100vw - 28px));grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;
+  width:min(360px,calc(100vw - 28px));grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;
   padding:5px;border:1px solid var(--border-color);border-radius:16px;background:rgba(15,16,17,.88);
   box-shadow:0 18px 48px rgba(0,0,0,.28);transform:translateX(-50%);opacity:1;pointer-events:auto;backdrop-filter:blur(18px);
   transition:transform .22s ease,opacity .18s ease,background .18s ease,box-shadow .18s ease;
@@ -2220,7 +2228,7 @@ body.page-slide-right #survey-content{transform:translateX(22px);opacity:.72}
 @media(min-width:761px){
   .bottom-tab-bar{
     display:grid;
-    width:min(420px,calc(100vw - 48px));
+    width:min(360px,calc(100vw - 48px));
     bottom:calc(16px + env(safe-area-inset-bottom));
     padding:6px;
     gap:6px;
@@ -2229,18 +2237,19 @@ body.page-slide-right #survey-content{transform:translateX(22px);opacity:.72}
   .bottom-tab{min-height:50px;font-size:13px;gap:0;flex-direction:row}
 }
 @media(min-width:1180px){
-  .bottom-tab-bar{width:min(440px,calc(100vw - 64px));bottom:calc(18px + env(safe-area-inset-bottom))}
+  .bottom-tab-bar{width:min(380px,calc(100vw - 64px));bottom:calc(18px + env(safe-area-inset-bottom))}
   .bottom-tab{min-height:52px;font-size:14px}
 }
 @media(max-width:760px){
   body.audience-home,
   body.audience-forecast,
   body.audience-sim,
+  body.audience-public,
   body.audience-parliament,
   body.audience-government,
   body.audience-b2c,
   body.audience-b2b{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
-  .bottom-tab-bar{display:grid;bottom:calc(10px + env(safe-area-inset-bottom));width:min(318px,calc(100vw - 48px));border-radius:14px}
+  .bottom-tab-bar{display:grid;bottom:calc(10px + env(safe-area-inset-bottom));width:min(280px,calc(100vw - 48px));border-radius:14px}
   .bottom-tab{min-height:46px;font-size:11px;border-radius:10px;gap:0;flex-direction:column}
   .bottom-tab .public-tab-icon{width:19px;height:19px}
 }
@@ -2250,6 +2259,7 @@ body.page-slide-right #survey-content{transform:translateX(22px);opacity:.72}
 
 /* Public agenda pages */
 .public-agenda-page{display:none;width:min(100%,1040px);margin:0 auto 28px;flex-direction:column;gap:14px}
+body.audience-public .public-agenda-all-page,
 body.audience-parliament .parliament-page,
 body.audience-government .government-page{display:flex}
 .public-agenda-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:4px 2px 10px;border-bottom:1px solid var(--border-color)}
@@ -2568,6 +2578,7 @@ html,body{overflow-x:hidden}
   body.audience-home .header-actions,
   body.audience-forecast .header-actions,
   body.audience-sim .header-actions,
+  body.audience-public .header-actions,
   body.audience-parliament .header-actions,
   body.audience-government .header-actions,
   body.audience-b2c .header-actions,

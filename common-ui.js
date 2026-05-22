@@ -22,11 +22,12 @@
     let issueViewObserver = null;
     let accountModalReturnFocus = null;
     let audienceTransitionTimer = null;
-    const audienceModeOrder = ['forecast', 'sim', 'home', 'parliament', 'government'];
+    const audienceModeOrder = ['forecast', 'sim', 'home', 'public'];
 
     function normalizeAudienceMode(mode) {
         if (mode === 'b2b' || mode === 'simulation') return 'sim';
         if (mode === 'b2c' || mode === 'main') return 'home';
+        if (mode === 'parliament' || mode === 'government' || mode === 'all') return 'public';
         return audienceModeOrder.includes(mode) ? mode : 'home';
     }
 
@@ -144,8 +145,9 @@
             target.classList.toggle('audience-home', nextMode === 'home');
             target.classList.toggle('audience-forecast', nextMode === 'forecast');
             target.classList.toggle('audience-sim', nextMode === 'sim');
-            target.classList.toggle('audience-parliament', nextMode === 'parliament');
-            target.classList.toggle('audience-government', nextMode === 'government');
+            target.classList.toggle('audience-public', nextMode === 'public');
+            target.classList.toggle('audience-parliament', false);
+            target.classList.toggle('audience-government', false);
             target.classList.toggle('audience-b2c', nextMode === 'home');
             target.classList.toggle('audience-b2b', nextMode === 'sim');
         });
@@ -161,8 +163,7 @@
     }
 
     function getActiveAudienceMode() {
-        if (document.body.classList.contains('audience-government')) return 'government';
-        if (document.body.classList.contains('audience-parliament')) return 'parliament';
+        if (document.body.classList.contains('audience-public')) return 'public';
         if (document.body.classList.contains('audience-forecast')) return 'forecast';
         if (document.body.classList.contains('audience-sim') || document.body.classList.contains('audience-b2b')) return 'sim';
         return 'home';
@@ -172,8 +173,7 @@
         const nextMode = normalizeAudienceMode(mode);
         if (nextMode === 'forecast') return document.getElementById('forecast-vote-section');
         if (nextMode === 'sim') return document.querySelector('.custom-sim-section');
-        if (nextMode === 'parliament') return document.getElementById('parliament-page');
-        if (nextMode === 'government') return document.getElementById('government-page');
+        if (nextMode === 'public') return document.getElementById('public-agenda-page');
         return document.getElementById('issues');
     }
 
@@ -1621,12 +1621,11 @@
         const modes = [
             ['home', '홈'],
             ['sim', '시뮬레이션'],
-            ['parliament', '의회'],
-            ['government', '정부'],
+            ['public', '전체'],
         ];
         return `<div class="account-section account-default-screen">
             <div class="account-section-head"><strong>기본 화면</strong><span>${escapeHtml(modes.find(([mode]) => mode === current)?.[1] || '홈')}</span></div>
-            <div class="account-segmented account-segmented-quad" role="group" aria-label="기본 화면">
+            <div class="account-segmented account-segmented-trio" role="group" aria-label="기본 화면">
                 ${modes.map(([mode, label]) => `<button type="button" data-account-audience="${mode}" class="${current === mode ? 'active' : ''}" aria-pressed="${current === mode ? 'true' : 'false'}">${escapeHtml(label)}</button>`).join('')}
             </div>
         </div>`;

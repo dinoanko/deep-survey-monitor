@@ -2095,21 +2095,52 @@ renderModal = function (issue, issueKey = activeModalIssueKey) {
 // ── Custom Policy Simulation ──
 const API_BASES = (() => {
     const origin = window.location.origin;
+    const host = window.location.hostname;
     const localBases = [
         'http://localhost:8000/api/v1',
         'http://127.0.0.1:8000/api/v1',
         'http://localhost:8001/api/v1',
         'http://127.0.0.1:8001/api/v1',
     ];
+    const normalizeApiBase = (base) => {
+        const value = String(base || '').trim().replace(/\/+$/, '');
+        if (!value) return '';
+        return /\/api\/v1$/i.test(value) ? value : `${value}/api/v1`;
+    };
+    const search = new URLSearchParams(window.location.search || '');
+    const configuredBase = search.get('api') || search.get('apiBase') || window.DEEP_SURVEY_API_BASE || '';
+    const configuredBases = [
+        configuredBase,
+        ...(Array.isArray(window.DEEP_SURVEY_API_BASES) ? window.DEEP_SURVEY_API_BASES : []),
+    ].map(normalizeApiBase).filter(Boolean);
+    if (search.get('api') || search.get('apiBase')) {
+        try {
+            window.localStorage?.setItem('deep-survey-api-base', normalizeApiBase(configuredBase));
+        } catch (_) {}
+    }
+    try {
+        const savedBase = normalizeApiBase(window.localStorage?.getItem('deep-survey-api-base'));
+        if (savedBase) configuredBases.push(savedBase);
+    } catch (_) {}
+    const uniqueConfiguredBases = [...new Set(configuredBases)];
+    if (uniqueConfiguredBases.length) return uniqueConfiguredBases;
     if (origin.startsWith('file') || origin === 'null') return localBases;
     if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
         return [origin + '/api/v1', ...localBases.filter(base => !base.startsWith(origin))];
     }
-    // Remote origins (e.g. GitHub Pages): try origin first, then fall back to local dev server
-    return [origin + '/api/v1', ...localBases];
+    if (/\.github\.io$/i.test(host)) return [];
+    return [origin + '/api/v1'];
 })();
 
+function getApiUnavailableMessage() {
+    if (/\.github\.io$/i.test(window.location.hostname)) {
+        return 'GitHub Pages는 정적 호스팅이라 /api/v1 백엔드를 실행할 수 없습니다. 외부 API 배포 후 ?api=https://your-api.example.com/api/v1 로 연결하세요.';
+    }
+    return 'API unavailable';
+}
+
 async function apiFetch(path, options = {}) {
+    if (!API_BASES.length) throw new Error(getApiUnavailableMessage());
     let lastError;
     for (const base of API_BASES) {
         try {
@@ -2149,6 +2180,7 @@ let activePromptSuggestionText = '';
 const PUBLIC_AGENDA_REFRESH_MS = 5 * 60 * 1000;
 const PUBLIC_AGENDA_DEFAULT_VIEW = 'list';
 const PUBLIC_AGENDA_VIEW_MODES = new Set(['grid-3-2', 'grid-2-3', 'list']);
+const PUBLIC_AGENDA_SOURCE_KINDS = ['parliament', 'government'];
 const PUBLIC_AGENDA_COMMITTEE_SHORT_LABELS = {
     '과학기술정보방송통신위원회': '과방위',
     '산업통상자원중소벤처기업위원회': '산자중기위',
@@ -2158,6 +2190,7 @@ const PUBLIC_AGENDA_COMMITTEE_SHORT_LABELS = {
     '국토교통위원회': '국토위',
 };
 const publicAgendaState = {
+    public: { loading: false, loaded: false, timer: null, items: [], lastPayload: null, viewMode: PUBLIC_AGENDA_DEFAULT_VIEW },
     parliament: { loading: false, loaded: false, timer: null, items: [], lastPayload: null, viewMode: PUBLIC_AGENDA_DEFAULT_VIEW },
     government: { loading: false, loaded: false, timer: null, items: [], lastPayload: null, viewMode: PUBLIC_AGENDA_DEFAULT_VIEW },
 };
@@ -4315,12 +4348,16 @@ function renderSimulationFailure(error, directions = [], issue = null, sampleSiz
     const errorEl = document.getElementById('custom-sim-error');
     if (!errorEl) return;
     const selectedTitles = directions.map(direction => direction.title).filter(Boolean);
+    const isGithubPages = /\.github\.io$/i.test(window.location.hostname);
+    const apiHelpCopy = isGithubPages
+        ? '현재 배포 위치가 GitHub Pages라서 정적 파일만 제공됩니다. 시뮬레이션 job을 실행하려면 별도 API 서버를 배포하고 URL에 ?api=https://your-api.example.com/api/v1 형태로 연결해야 합니다.'
+        : 'API 표본추출 job이 성공했을 때만 결과를 보여줍니다. 배포된 API 라우트 또는 로컬 API 서버에서 /api/v1/survey/simulations/start 접근 가능 여부를 확인해야 합니다.';
     errorEl.innerHTML = `<div class="simulation-error-card">
         <div class="simulation-error-head">
             <strong>실시간 시뮬레이션을 실행하지 못했습니다</strong>
             <span>fallback 결과를 표시하지 않았습니다</span>
         </div>
-        <p>이 버튼은 이제 저장된 데모값을 띄우지 않고, API 표본추출 job이 성공했을 때만 결과를 보여줍니다. 배포된 API 라우트 또는 로컬 API 서버에서 <code>/api/v1/survey/simulations/start</code> 접근 가능 여부를 확인해야 합니다.</p>
+        <p>${escapeHtml(apiHelpCopy)}</p>
         <p class="simulation-error-preserved">입력은 보존했습니다. 같은 이슈·질문·표본수로 다시 실행하거나 API 설정을 확인할 수 있습니다.</p>
         <div class="simulation-error-trust-strip" aria-label="실패 후 보존된 실행 조건">
             <span><strong>입력·표본 조건 보존</strong> 같은 질문과 표본수로 다시 실행</span>
@@ -4446,10 +4483,10 @@ window.setPublicAgendaView = function (kind, mode) {
 };
 
 function initPublicAgendaFeeds() {
-    ['parliament', 'government'].forEach(kind => {
+    ['public'].forEach(kind => {
         publicAgendaState[kind].viewMode = readPublicAgendaView(kind);
         syncPublicAgendaViewControls(kind);
-        renderPublicAgendaLoading(kind, '동기화 대기');
+        renderPublicAgendaLoading(kind, '의회·정부 동기화 대기');
         refreshPublicAgendaFeed(kind);
         if (publicAgendaState[kind].timer) clearInterval(publicAgendaState[kind].timer);
         publicAgendaState[kind].timer = setInterval(() => refreshPublicAgendaFeed(kind, { silent: true }), PUBLIC_AGENDA_REFRESH_MS);
@@ -4459,17 +4496,19 @@ function initPublicAgendaFeeds() {
 window.refreshPublicAgendaFeed = async function (kind, options = {}) {
     if (!publicAgendaState[kind] || publicAgendaState[kind].loading) return;
     publicAgendaState[kind].loading = true;
-    if (!options.silent) renderPublicAgendaLoading(kind, '동기화 중');
+    if (!options.silent) renderPublicAgendaLoading(kind, kind === 'public' ? '의회·정부 동기화 중' : '동기화 중');
     try {
         const limit = 50;
-        const res = await apiFetch(`/survey/public-agenda/${kind}?limit=${limit}&_=${Date.now()}`, { cache: 'no-store' });
-        if (!res.ok) throw new Error(`API ${res.status}`);
-        const data = await res.json();
+        const data = kind === 'public'
+            ? await loadCombinedPublicAgenda(limit)
+            : await fetchPublicAgendaPayload(kind, limit);
         publicAgendaState[kind].items = Array.isArray(data.items) ? data.items : [];
         publicAgendaState[kind].loaded = true;
         renderPublicAgendaFeed(kind, data);
     } catch (err) {
-        const fallback = buildFallbackPublicAgenda(kind);
+        const fallback = kind === 'public'
+            ? mergePublicAgendaPayloads(PUBLIC_AGENDA_SOURCE_KINDS.map(sourceKind => buildFallbackPublicAgenda(sourceKind)))
+            : buildFallbackPublicAgenda(kind);
         publicAgendaState[kind].items = fallback.items;
         publicAgendaState[kind].loaded = true;
         renderPublicAgendaFeed(kind, fallback);
@@ -4477,6 +4516,57 @@ window.refreshPublicAgendaFeed = async function (kind, options = {}) {
         publicAgendaState[kind].loading = false;
     }
 };
+
+async function fetchPublicAgendaPayload(kind, limit = 50) {
+    const res = await apiFetch(`/survey/public-agenda/${kind}?limit=${limit}&_=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    return normalizePublicAgendaSourcePayload(kind, data);
+}
+
+function normalizePublicAgendaSourcePayload(kind, data) {
+    const items = Array.isArray(data?.items)
+        ? data.items.map(item => ({ ...item, kind: item?.kind || kind }))
+        : [];
+    return { ...(data || {}), kind, items, count: Number(data?.count || items.length || 0) };
+}
+
+async function loadCombinedPublicAgenda(limit = 50) {
+    const payloads = await Promise.all(PUBLIC_AGENDA_SOURCE_KINDS.map(sourceKind =>
+        fetchPublicAgendaPayload(sourceKind, limit).catch(() => buildFallbackPublicAgenda(sourceKind))
+    ));
+    payloads.forEach(payload => {
+        const sourceKind = payload.kind;
+        if (!publicAgendaState[sourceKind]) return;
+        publicAgendaState[sourceKind].items = Array.isArray(payload.items) ? payload.items : [];
+        publicAgendaState[sourceKind].lastPayload = payload;
+        publicAgendaState[sourceKind].loaded = true;
+    });
+    return mergePublicAgendaPayloads(payloads);
+}
+
+function mergePublicAgendaPayloads(payloads) {
+    const items = payloads
+        .flatMap(payload => (Array.isArray(payload?.items) ? payload.items : []).map(item => ({ ...item, kind: item?.kind || payload.kind })))
+        .sort((a, b) => getPublicAgendaSortTime(b) - getPublicAgendaSortTime(a) || Number(a?.poll?.gap || 999) - Number(b?.poll?.gap || 999));
+    const refreshedValues = payloads
+        .map(payload => new Date(payload?.refreshed_at || '').getTime())
+        .filter(value => Number.isFinite(value));
+    const source = payloads.every(payload => payload?.source === 'local_fallback') ? 'local_fallback' : 'combined_live';
+    return {
+        kind: 'public',
+        source,
+        source_url: 'combined:parliament+government',
+        refreshed_at: refreshedValues.length ? new Date(Math.max(...refreshedValues)).toISOString() : new Date().toISOString(),
+        count: items.length,
+        items,
+    };
+}
+
+function getPublicAgendaSortTime(item) {
+    const date = parsePublicAgendaDate(item?.proposed_at || item?.published_at || item?.created_at || item?.updated_at);
+    return date ? date.getTime() : 0;
+}
 
 function renderPublicAgendaLoading(kind, label) {
     const status = document.getElementById(`${kind}-feed-status`);
@@ -4596,7 +4686,7 @@ function renderPublicAgendaFeed(kind, data) {
         ? refreshed.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
         : '방금';
     if (status) {
-        const source = data?.source === 'local_fallback' ? '로컬 폴백' : (kind === 'parliament' ? '국회 동기화' : '정책브리핑 동기화');
+        const source = data?.source === 'local_fallback' ? '로컬 폴백' : (kind === 'public' ? '의회·정부 동기화' : (kind === 'parliament' ? '국회 동기화' : '정책브리핑 동기화'));
         status.textContent = `${source} · ${time}`;
     }
     if (count) count.textContent = `${Number(data?.count || items.length || 0).toLocaleString('ko-KR')}건`;
@@ -4611,7 +4701,7 @@ function renderPublicAgendaFeed(kind, data) {
         list.innerHTML = '<div class="public-agenda-empty">표시할 안건 없음</div>';
         return;
     }
-    list.innerHTML = items.map((item, idx) => renderPublicAgendaCard(kind, item, idx, viewMode)).join('');
+    list.innerHTML = items.map((item, idx) => renderPublicAgendaCard(item.kind || kind, item, idx, viewMode)).join('');
 }
 
 function renderPublicOpinionChoices(support, oppose, unsure) {

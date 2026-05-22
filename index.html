@@ -39,7 +39,7 @@
             ) return '';
             return '';
         })();
-        document.write(`<link rel="stylesheet" href="${window.DEEP_SURVEY_ASSET_BASE}styles.css?v=20260521d">`);
+        document.write(`<link rel="stylesheet" href="${window.DEEP_SURVEY_ASSET_BASE}styles.css?v=20260522c">`);
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('[data-demo-src]').forEach(el => {
                 el.setAttribute('src', `${window.DEEP_SURVEY_ASSET_BASE}${el.dataset.demoSrc}`);
@@ -600,7 +600,7 @@
             </div>
             </section>
 
-            <section class="public-agenda-page parliament-page" id="parliament-page" aria-labelledby="parliament-title">
+            <section class="public-agenda-page public-agenda-all-page" id="public-agenda-page" aria-labelledby="public-agenda-title">
                 <div class="public-agenda-head">
                     <div class="public-agenda-title-row">
                         <span class="public-page-icon public-icon-assembly" aria-hidden="true">
@@ -611,54 +611,24 @@
                             </svg>
                         </span>
                         <div>
-                            <span>ASSEMBLY LIVE</span>
-                            <h2 id="parliament-title">실시간 의회</h2>
+                            <span>PUBLIC LIVE</span>
+                            <h2 id="public-agenda-title">실시간 전체</h2>
                         </div>
                     </div>
                     <div class="public-agenda-head-controls">
-                        <div class="public-agenda-meta" id="parliament-feed-status">계류 의안 동기화 대기</div>
-                        <div class="public-agenda-view-switch" role="group" aria-label="의회 보기 모드">
-                            <button type="button" data-public-agenda-kind="parliament" data-public-view="grid-3-2" aria-label="3대2 카드 보기" title="3:2" aria-pressed="false" onclick="setPublicAgendaView('parliament','grid-3-2')"><span class="public-view-icon public-view-icon-3-2" aria-hidden="true"></span></button>
-                            <button type="button" data-public-agenda-kind="parliament" data-public-view="grid-2-3" aria-label="2대3 카드 보기" title="2:3" aria-pressed="false" onclick="setPublicAgendaView('parliament','grid-2-3')"><span class="public-view-icon public-view-icon-2-3" aria-hidden="true"></span></button>
-                            <button class="active" type="button" data-public-agenda-kind="parliament" data-public-view="list" aria-label="리스트 보기" title="리스트" aria-pressed="true" onclick="setPublicAgendaView('parliament','list')"><span class="public-view-icon public-view-icon-list" aria-hidden="true"></span></button>
+                        <div class="public-agenda-meta" id="public-feed-status">의회·정부 동기화 대기</div>
+                        <div class="public-agenda-view-switch" role="group" aria-label="전체 보기 모드">
+                            <button type="button" data-public-agenda-kind="public" data-public-view="grid-3-2" aria-label="3대2 카드 보기" title="3:2" aria-pressed="false" onclick="setPublicAgendaView('public','grid-3-2')"><span class="public-view-icon public-view-icon-3-2" aria-hidden="true"></span></button>
+                            <button type="button" data-public-agenda-kind="public" data-public-view="grid-2-3" aria-label="2대3 카드 보기" title="2:3" aria-pressed="false" onclick="setPublicAgendaView('public','grid-2-3')"><span class="public-view-icon public-view-icon-2-3" aria-hidden="true"></span></button>
+                            <button class="active" type="button" data-public-agenda-kind="public" data-public-view="list" aria-label="리스트 보기" title="리스트" aria-pressed="true" onclick="setPublicAgendaView('public','list')"><span class="public-view-icon public-view-icon-list" aria-hidden="true"></span></button>
                         </div>
                     </div>
                 </div>
                 <div class="public-agenda-toolbar">
-                    <strong id="parliament-feed-count">0건</strong>
-                    <button class="public-agenda-refresh" type="button" onclick="refreshPublicAgendaFeed('parliament')"><span class="mono-icon mono-icon-refresh" aria-hidden="true"></span>새로고침</button>
+                    <strong id="public-feed-count">0건</strong>
+                    <button class="public-agenda-refresh" type="button" onclick="refreshPublicAgendaFeed('public')"><span class="mono-icon mono-icon-refresh" aria-hidden="true"></span>새로고침</button>
                 </div>
-                <div class="public-agenda-list" id="parliament-feed-list" aria-live="polite"></div>
-            </section>
-
-            <section class="public-agenda-page government-page" id="government-page" aria-labelledby="government-title">
-                <div class="public-agenda-head">
-                    <div class="public-agenda-title-row">
-                        <span class="public-page-icon public-icon-government" aria-hidden="true">
-                            <svg viewBox="0 0 256 256" focusable="false">
-                                <path d="M128 8c66.3 0 120 53.7 120 120 0 50.4-31.1 93.5-75.1 111.2 36.3-27.1 55.9-74.3 43.5-122.5C199.2 49.9 139.7 21.5 87 47.2c-33.3 16.2-50.2 50-42 82.6 5.3 21 21.3 34.7 41.2 35.2 18 .4 30.1-8.1 40.6-25.5 11.6-19.2 32.9-25.5 53.2-14.8 20.9 11 29.2 35.8 20.3 59.6-13.8 36.7-52.7 58.7-96.6 51C48.8 225.8 8 180.5 8 128 8 61.7 61.7 8 128 8Z"/>
-                                <path d="M104.8 47.4C160.3 19.7 222.2 53 237.7 116.6c5.7 23.4 4.2 45.5-3.2 64.9 21.4-63.1-13-125.8-75.4-138.1-19-3.7-37.3-2.1-54.3 4Z"/>
-                            </svg>
-                        </span>
-                        <div>
-                            <span>GOVERNMENT LIVE</span>
-                            <h2 id="government-title">실시간 정부</h2>
-                        </div>
-                    </div>
-                    <div class="public-agenda-head-controls">
-                        <div class="public-agenda-meta" id="government-feed-status">정책브리핑 동기화 대기</div>
-                        <div class="public-agenda-view-switch" role="group" aria-label="정부 보기 모드">
-                            <button type="button" data-public-agenda-kind="government" data-public-view="grid-3-2" aria-label="3대2 카드 보기" title="3:2" aria-pressed="false" onclick="setPublicAgendaView('government','grid-3-2')"><span class="public-view-icon public-view-icon-3-2" aria-hidden="true"></span></button>
-                            <button type="button" data-public-agenda-kind="government" data-public-view="grid-2-3" aria-label="2대3 카드 보기" title="2:3" aria-pressed="false" onclick="setPublicAgendaView('government','grid-2-3')"><span class="public-view-icon public-view-icon-2-3" aria-hidden="true"></span></button>
-                            <button class="active" type="button" data-public-agenda-kind="government" data-public-view="list" aria-label="리스트 보기" title="리스트" aria-pressed="true" onclick="setPublicAgendaView('government','list')"><span class="public-view-icon public-view-icon-list" aria-hidden="true"></span></button>
-                        </div>
-                    </div>
-                </div>
-                <div class="public-agenda-toolbar">
-                    <strong id="government-feed-count">0건</strong>
-                    <button class="public-agenda-refresh" type="button" onclick="refreshPublicAgendaFeed('government')"><span class="mono-icon mono-icon-refresh" aria-hidden="true"></span>새로고침</button>
-                </div>
-                <div class="public-agenda-list" id="government-feed-list" aria-live="polite"></div>
+                <div class="public-agenda-list" id="public-feed-list" aria-live="polite"></div>
             </section>
         </div>
 
@@ -674,20 +644,12 @@
         <button class="bottom-tab bottom-tab-home active has-new" type="button" data-audience-mode="home" role="tab" aria-label="홈" aria-selected="true" aria-current="page" onclick="selectAudienceMode('home')">
             <span class="mono-icon mono-icon-home" aria-hidden="true"></span>
         </button>
-        <button class="bottom-tab" type="button" data-audience-mode="parliament" role="tab" aria-label="의회" title="의회" aria-selected="false" aria-current="false" onclick="selectAudienceMode('parliament')">
+        <button class="bottom-tab" type="button" data-audience-mode="public" role="tab" aria-label="전체" title="전체" aria-selected="false" aria-current="false" onclick="selectAudienceMode('public')">
             <span class="public-tab-icon" aria-hidden="true">
                 <svg viewBox="0 0 160 128" focusable="false">
                     <path d="M80 8c28.9 0 52.5 17.3 58.7 42H21.3C27.5 25.3 51.1 8 80 8Zm-31.6 34h63.2C105.5 30.1 94.1 22 80 22s-25.5 8.1-31.6 20Z"/>
                     <path d="M0 47h160v8H0zM8 104h144v8H8zM2 117h156v8H2z"/>
                     <path d="M18 62h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Zm22 0h14l-3 36h-8l-3-36Z"/>
-                </svg>
-            </span>
-        </button>
-        <button class="bottom-tab" type="button" data-audience-mode="government" role="tab" aria-label="정부" title="정부" aria-selected="false" aria-current="false" onclick="selectAudienceMode('government')">
-            <span class="public-tab-icon" aria-hidden="true">
-                <svg viewBox="0 0 256 256" focusable="false">
-                    <path d="M128 8c66.3 0 120 53.7 120 120 0 50.4-31.1 93.5-75.1 111.2 36.3-27.1 55.9-74.3 43.5-122.5C199.2 49.9 139.7 21.5 87 47.2c-33.3 16.2-50.2 50-42 82.6 5.3 21 21.3 34.7 41.2 35.2 18 .4 30.1-8.1 40.6-25.5 11.6-19.2 32.9-25.5 53.2-14.8 20.9 11 29.2 35.8 20.3 59.6-13.8 36.7-52.7 58.7-96.6 51C48.8 225.8 8 180.5 8 128 8 61.7 61.7 8 128 8Z"/>
-                    <path d="M104.8 47.4C160.3 19.7 222.2 53 237.7 116.6c5.7 23.4 4.2 45.5-3.2 64.9 21.4-63.1-13-125.8-75.4-138.1-19-3.7-37.3-2.1-54.3 4Z"/>
                 </svg>
             </span>
         </button>
@@ -754,7 +716,7 @@
     </footer>
 
     <script>
-        ['app.js?v=20260521e', 'issues_extra.js?v=20260515e', 'common-ui.js?v=20260522a', 'beta-intake.js?v=20260519b']
+        ['app.js?v=20260522c', 'issues_extra.js?v=20260515e', 'common-ui.js?v=20260522c', 'beta-intake.js?v=20260519b']
             .forEach(src => document.write(`<script src="${window.DEEP_SURVEY_ASSET_BASE}${src}"><\/script>`));
     </script>
 </body>
