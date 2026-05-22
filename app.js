@@ -2115,7 +2115,7 @@ async function apiFetch(path, options = {}) {
         try {
             const res = await fetch(`${base}${path}`, options);
             if (res.ok || ![404, 405, 502, 503, 504].includes(res.status)) return res;
-            lastError = new Error(`API ${res.status}`);
+            lastError = new Error(`API ${res.status}${res.statusText ? ` ${res.statusText}` : ''}`);
         } catch (err) {
             lastError = err;
         }
@@ -4215,7 +4215,11 @@ async function extractApiErrorMessage(response, fallback = 'API unavailable') {
         return extractSimulationErrorMessage(payload) || fallback;
     } catch (_) {
         try {
-            return (await response.clone().text()) || fallback;
+            const text = (await response.clone().text()) || '';
+            if (/^\s*</.test(text)) {
+                return `${fallback}${response?.status ? ` (${response.status}${response.statusText ? ` ${response.statusText}` : ''})` : ''}`;
+            }
+            return text || fallback;
         } catch (__) {
             return fallback;
         }
@@ -4316,7 +4320,7 @@ function renderSimulationFailure(error, directions = [], issue = null, sampleSiz
             <strong>실시간 시뮬레이션을 실행하지 못했습니다</strong>
             <span>fallback 결과를 표시하지 않았습니다</span>
         </div>
-        <p>이 버튼은 이제 저장된 데모값을 띄우지 않고, 백엔드 표본추출 job이 성공했을 때만 결과를 보여줍니다. API 서버가 켜져 있는지와 <code>/api/v1/survey/simulations/start</code> 접근 가능 여부를 확인해야 합니다.</p>
+        <p>이 버튼은 이제 저장된 데모값을 띄우지 않고, API 표본추출 job이 성공했을 때만 결과를 보여줍니다. 배포된 API 라우트 또는 로컬 API 서버에서 <code>/api/v1/survey/simulations/start</code> 접근 가능 여부를 확인해야 합니다.</p>
         <p class="simulation-error-preserved">입력은 보존했습니다. 같은 이슈·질문·표본수로 다시 실행하거나 API 설정을 확인할 수 있습니다.</p>
         <div class="simulation-error-trust-strip" aria-label="실패 후 보존된 실행 조건">
             <span><strong>입력·표본 조건 보존</strong> 같은 질문과 표본수로 다시 실행</span>

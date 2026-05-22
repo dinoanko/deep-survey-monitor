@@ -59,7 +59,7 @@
     }
 
     function getCurrentThemeMode() {
-        return normalizeThemeMode(root.dataset.themeMode || readSavedTheme() || 'system');
+        return normalizeThemeMode(root.dataset.themeMode || readSavedTheme() || 'light');
     }
 
     function resolveTheme(mode) {
@@ -79,7 +79,7 @@
         }
     }
 
-    function applyTheme(mode = 'system', persist = false) {
+    function applyTheme(mode = 'light', persist = false) {
         const nextMode = normalizeThemeMode(mode);
         const resolvedTheme = resolveTheme(nextMode);
         root.dataset.themeMode = nextMode;
@@ -104,7 +104,7 @@
         applyTheme(next, true);
     };
 
-    const initialTheme = readSavedTheme() || 'dark';
+    const initialTheme = readSavedTheme() || 'light';
     applyTheme(initialTheme, false);
 
     const systemThemeMedia = window.matchMedia?.('(prefers-color-scheme: dark)');
